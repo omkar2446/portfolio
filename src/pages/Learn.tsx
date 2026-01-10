@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import PageTransition from '@/components/PageTransition';
 import AnimatedSection from '@/components/AnimatedSection';
@@ -8,20 +9,23 @@ const courses = [
   {
     icon: <Code size={32} />,
     title: 'Web Development',
-    description: 'Learn HTML, CSS, and JavaScript from scratch. Build responsive and modern websites.',
+    description: 'Learn HTML.',
     status: 'available',
+    youtubeId: 'yrXeT0jfc7w',
   },
   {
     icon: <Terminal size={32} />,
     title: 'Python Basics',
     description: 'Master Python programming fundamentals. Perfect for beginners and automation enthusiasts.',
     status: 'available',
+    youtubeId: 'YOUR_YOUTUBE_VIDEO_ID_2',
   },
   {
     icon: <Atom size={32} />,
     title: 'React for Beginners',
     description: 'Build interactive user interfaces with React. Learn component-based architecture.',
     status: 'available',
+    youtubeId: 'YOUR_YOUTUBE_VIDEO_ID_3',
   },
   {
     icon: <Brain size={32} />,
@@ -32,6 +36,8 @@ const courses = [
 ];
 
 const Learn = () => {
+  const [activeVideo, setActiveVideo] = useState(null);
+
   return (
     <PageTransition>
       <div className="min-h-screen pt-24">
@@ -69,6 +75,8 @@ const Learn = () => {
                     <Button 
                       variant={course.status === 'learning' ? 'outline' : 'default'}
                       className="w-full"
+                      disabled={course.status === 'learning'}
+                      onClick={() => setActiveVideo(course.youtubeId)}
                     >
                       {course.status === 'learning' ? (
                         <>
@@ -103,6 +111,33 @@ const Learn = () => {
           </AnimatedSection>
         </section>
       </div>
+
+      {/* ================= YouTube Popup Modal ================= */}
+      {activeVideo && (
+<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+          <div className="relative w-full max-w-3xl aspect-video bg-black rounded-xl overflow-hidden">
+            
+            {/* Close Button */}
+            <button
+              onClick={() => setActiveVideo(null)}
+              className="absolute top-3 right-3 z-10 bg-black/70 text-white px-3 py-1 rounded"
+            >
+              ✕
+            </button>
+
+            {/* YouTube Video */}
+            <iframe
+              className="w-full h-full"
+              src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1`}
+              title="YouTube video player"
+              frameBorder="0"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+            />
+          </div>
+        </div>
+      )}
+      {/* ======================================================= */}
     </PageTransition>
   );
 };
