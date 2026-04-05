@@ -8,15 +8,13 @@ import SkillCard from '@/components/SkillCard';
 import profilePhoto from '@/assets/profile-photo.png';
 import {
   Code, Palette, FileCode2, Atom, Terminal, Brain, Sparkles, ArrowRight,
-  Music2, Pause
+  Music2
 } from 'lucide-react';
 
 /* ═══════════════════════════════════════════════════════
-   GLOBAL STYLES
+   GLOBAL STYLES  (cursor + scroll-progress removed)
 ═══════════════════════════════════════════════════════ */
 const STYLES = `
-  * { cursor: none !important; }
-
   @keyframes fadeUp {
     from { opacity:0; transform:translateY(48px); }
     to   { opacity:1; transform:translateY(0); }
@@ -56,10 +54,6 @@ const STYLES = `
     40%      { transform:translateY(-7px); }
     60%      { transform:translateY(-3px); }
   }
-  @keyframes trailFade {
-    0%   { opacity:.65; transform:translate(-50%,-50%) scale(1); }
-    100% { opacity:0;   transform:translate(-50%,-50%) scale(0); }
-  }
   @keyframes scrollIndicator {
     0%,100% { transform:translateX(-50%) translateY(0); opacity:.8; }
     50%      { transform:translateX(-50%) translateY(12px); opacity:.3; }
@@ -89,28 +83,142 @@ const STYLES = `
     50%      { transform:scaleY(1); }
   }
 
-  /* ── cursor ── */
-  #cursor-dot {
-    position:fixed; top:0; left:0; width:10px; height:10px;
-    background:#fff; border-radius:50%;
-    transform:translate(-50%,-50%);
-    pointer-events:none; z-index:99999;
-    mix-blend-mode:difference;
-    transition:width .18s ease, height .18s ease;
+  /* ── entry screen ── */
+  @keyframes entryOrbFloat1 {
+    0%,100% { transform:translate(0,0) scale(1); }
+    50%      { transform:translate(30px,-20px) scale(1.1); }
   }
-  #cursor-ring {
-    position:fixed; top:0; left:0; width:36px; height:36px;
-    border:1.5px solid rgba(255,255,255,.6); border-radius:50%;
-    transform:translate(-50%,-50%);
-    pointer-events:none; z-index:99998;
-    transition:width .22s ease, height .22s ease, border-color .2s;
+  @keyframes entryOrbFloat2 {
+    0%,100% { transform:translate(0,0) scale(1); }
+    50%      { transform:translate(-20px,30px) scale(1.08); }
   }
-  #cursor-dot.clicking  { width:5px; height:5px; }
-  #cursor-ring.clicking { width:18px; height:18px; border-color:rgba(167,139,250,.9); }
+  @keyframes entryFadeIn {
+    from { opacity:0; transform:translateY(24px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+  @keyframes entryRingPop {
+    from { opacity:0; transform:scale(.7); }
+    to   { opacity:1; transform:scale(1); }
+  }
+  @keyframes entryIconPulse {
+    0%,100% { box-shadow:0 0 0 0 rgba(167,139,250,.4); }
+    50%      { box-shadow:0 0 0 14px rgba(167,139,250,0); }
+  }
+  @keyframes entrySpinRing {
+    to { transform:rotate(360deg); }
+  }
+  @keyframes entryOverlayOut {
+    from { opacity:1; transform:scale(1); }
+    to   { opacity:0; transform:scale(1.04); }
+  }
 
-  .cursor-trail {
-    position:fixed; border-radius:50%; pointer-events:none;
-    z-index:99997; animation:trailFade .55s ease forwards;
+  .entry-overlay {
+    position:fixed; inset:0; z-index:99999;
+    background:#0a0a0f;
+    display:flex; align-items:center; justify-content:center;
+    overflow:hidden;
+  }
+  .entry-overlay.leaving {
+    animation:entryOverlayOut .55s cubic-bezier(.22,1,.36,1) forwards;
+    pointer-events:none;
+  }
+  .entry-orb1 {
+    position:absolute; width:420px; height:420px; border-radius:50%;
+    background:radial-gradient(circle,rgba(139,92,246,.28) 0%,transparent 70%);
+    top:-100px; left:-80px;
+    animation:entryOrbFloat1 8s ease-in-out infinite;
+  }
+  .entry-orb2 {
+    position:absolute; width:340px; height:340px; border-radius:50%;
+    background:radial-gradient(circle,rgba(96,165,250,.22) 0%,transparent 70%);
+    bottom:-60px; right:-60px;
+    animation:entryOrbFloat2 11s ease-in-out infinite;
+  }
+  .entry-orb3 {
+    position:absolute; width:200px; height:200px; border-radius:50%;
+    background:radial-gradient(circle,rgba(244,114,182,.15) 0%,transparent 70%);
+    top:40%; left:60%;
+    animation:entryOrbFloat2 9s ease-in-out 2s infinite;
+  }
+  .entry-content {
+    text-align:center; position:relative; z-index:2;
+    padding:2.5rem 2rem;
+  }
+  .entry-icon-wrap {
+    position:relative; display:inline-flex;
+    align-items:center; justify-content:center;
+    margin-bottom:1.75rem;
+    animation:entryRingPop .6s cubic-bezier(.22,1,.36,1) .1s both;
+  }
+  .entry-ring1 {
+    position:absolute; width:96px; height:96px; border-radius:50%;
+    border:1.5px solid rgba(167,139,250,.35);
+    animation:entrySpinRing 6s linear infinite;
+  }
+  .entry-ring2 {
+    position:absolute; width:120px; height:120px; border-radius:50%;
+    border:1px dashed rgba(96,165,250,.2);
+    animation:entrySpinRing 10s linear infinite reverse;
+  }
+  .entry-icon-circle {
+    width:72px; height:72px; border-radius:50%;
+    background:rgba(139,92,246,.18);
+    border:1.5px solid rgba(167,139,250,.55);
+    display:flex; align-items:center; justify-content:center;
+    animation:entryIconPulse 2.5s ease-in-out infinite;
+  }
+  .entry-title {
+    color:#fff; font-size:1.5rem; font-weight:600;
+    margin:0 0 .4rem; letter-spacing:.01em;
+    animation:entryFadeIn .7s .15s both;
+  }
+  .entry-subtitle {
+    color:rgba(255,255,255,.5); font-size:.9rem;
+    margin:0 0 2.25rem;
+    animation:entryFadeIn .7s .25s both;
+  }
+  .entry-buttons {
+    display:flex; gap:14px; justify-content:center;
+    animation:entryFadeIn .7s .35s both;
+  }
+  .entry-btn-play {
+    display:flex; align-items:center; gap:9px;
+    padding:.65rem 1.6rem; border-radius:99px;
+    background:rgba(167,139,250,.85);
+    border:1.5px solid rgba(167,139,250,.9);
+    color:#fff; font-size:.9rem; font-weight:500;
+    cursor:pointer;
+    transition:transform .2s ease, background .2s ease, box-shadow .2s ease;
+  }
+  .entry-btn-play:hover {
+    transform:translateY(-3px) scale(1.04);
+    background:rgba(167,139,250,1);
+    box-shadow:0 10px 28px rgba(139,92,246,.45);
+  }
+  .entry-btn-skip {
+    padding:.65rem 1.6rem; border-radius:99px;
+    background:rgba(255,255,255,.06);
+    border:1.5px solid rgba(255,255,255,.15);
+    color:rgba(255,255,255,.7); font-size:.9rem; font-weight:500;
+    cursor:pointer;
+    transition:transform .2s ease, background .2s ease;
+  }
+  .entry-btn-skip:hover {
+    transform:translateY(-3px) scale(1.04);
+    background:rgba(255,255,255,.12);
+  }
+  .entry-hint {
+    color:rgba(255,255,255,.2); font-size:.75rem;
+    margin-top:1.75rem;
+    animation:entryFadeIn .7s .5s both;
+  }
+  .entry-bars {
+    display:flex; align-items:flex-end;
+    gap:3px; height:18px;
+  }
+  .entry-bar {
+    width:3.5px; border-radius:2px; background:white;
+    animation:barDance .8s ease-in-out infinite;
   }
 
   /* ── scroll-reveal ── */
@@ -190,214 +298,96 @@ const STYLES = `
 `;
 
 /* ═══════════════════════════════════════════════════════
-   CUSTOM CURSOR
+   MUSIC ENTRY SCREEN
 ═══════════════════════════════════════════════════════ */
-function CustomCursor() {
-  const dotRef  = useRef(null);
-  const ringRef = useRef(null);
-  const posRef  = useRef({ x: 0, y: 0 });
-  const ringPos = useRef({ x: 0, y: 0 });
-  const rafRef  = useRef(null);
-  const trailRef = useRef(0);
+function MusicEntryScreen({ onChoice }) {
+  const [leaving, setLeaving] = useState(false);
 
-  useEffect(() => {
-    const dot  = dotRef.current;
-    const ring = ringRef.current;
-
-    const onMove = (e) => {
-      posRef.current = { x: e.clientX, y: e.clientY };
-      dot.style.left = e.clientX + 'px';
-      dot.style.top  = e.clientY + 'px';
-
-      trailRef.current++;
-      if (trailRef.current % 2 === 0) {
-        const el = document.createElement('div');
-        el.className = 'cursor-trail';
-        const size = Math.random() * 7 + 4;
-        const hue  = Math.random() * 60 + 240;
-        el.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX}px;top:${e.clientY}px;background:hsla(${hue},80%,70%,.7);`;
-        document.body.appendChild(el);
-        setTimeout(() => el.remove(), 570);
-      }
-    };
-
-    const onDown = () => {
-      dot.classList.add('clicking');
-      ring.classList.add('clicking');
-      for (let i = 0; i < 7; i++) {
-        const angle = (i / 7) * Math.PI * 2;
-        const sp = document.createElement('div');
-        sp.style.cssText = `
-          position:fixed;width:5px;height:5px;border-radius:50%;
-          background:rgba(167,139,250,.95);
-          left:${posRef.current.x + Math.cos(angle) * 20}px;
-          top:${posRef.current.y + Math.sin(angle) * 20}px;
-          pointer-events:none;z-index:99999;
-          animation:trailFade .45s ease forwards;
-          animation-delay:${i * 28}ms;
-        `;
-        document.body.appendChild(sp);
-        setTimeout(() => sp.remove(), 520);
-      }
-    };
-    const onUp = () => {
-      dot.classList.remove('clicking');
-      ring.classList.remove('clicking');
-    };
-
-    const animate = () => {
-      ringPos.current.x += (posRef.current.x - ringPos.current.x) * 0.11;
-      ringPos.current.y += (posRef.current.y - ringPos.current.y) * 0.11;
-      ring.style.left = ringPos.current.x + 'px';
-      ring.style.top  = ringPos.current.y + 'px';
-      rafRef.current = requestAnimationFrame(animate);
-    };
-    rafRef.current = requestAnimationFrame(animate);
-
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mousedown', onDown);
-    window.addEventListener('mouseup',   onUp);
-    return () => {
-      window.removeEventListener('mousemove', onMove);
-      window.removeEventListener('mousedown', onDown);
-      window.removeEventListener('mouseup',   onUp);
-      cancelAnimationFrame(rafRef.current);
-    };
-  }, []);
+  const handleChoice = (withMusic) => {
+    setLeaving(true);
+    setTimeout(() => onChoice(withMusic), 520);
+  };
 
   return (
-    <>
-      <div id="cursor-dot"  ref={dotRef}  />
-      <div id="cursor-ring" ref={ringRef} />
-    </>
+    <div className={`entry-overlay${leaving ? ' leaving' : ''}`}>
+      <div className="entry-orb1" />
+      <div className="entry-orb2" />
+      <div className="entry-orb3" />
+
+      <div className="entry-content">
+        <div className="entry-icon-wrap">
+          <div className="entry-ring1" />
+          <div className="entry-ring2" />
+          <div className="entry-icon-circle">
+            <Music2 size={28} color="rgba(200,180,255,0.95)" />
+          </div>
+        </div>
+
+        <h2 className="entry-title">Background music</h2>
+        <p className="entry-subtitle">Would you like ambient music while browsing?</p>
+
+        <div className="entry-buttons">
+          <button className="entry-btn-play" onClick={() => handleChoice(true)}>
+            <div className="entry-bars">
+              {[0, 1, 2, 3].map((_, i) => (
+                <div key={i} className="entry-bar"
+                  style={{ animationDelay: `${i * 0.1}s`, height: '100%' }} />
+              ))}
+            </div>
+            Play music
+          </button>
+          <button className="entry-btn-skip" onClick={() => handleChoice(false)}>
+            Skip
+          </button>
+        </div>
+
+        <p className="entry-hint">You can change this anytime with the button below</p>
+      </div>
+    </div>
   );
 }
 
 /* ═══════════════════════════════════════════════════════
-   SCROLL REVEAL HOOK
+   MUSIC TOGGLE BUTTON (corner)
 ═══════════════════════════════════════════════════════ */
-function useScrollReveal() {
-  useEffect(() => {
-    const els = document.querySelectorAll(
-      '.scroll-reveal,.scroll-reveal-left,.scroll-reveal-right,.scroll-reveal-scale'
-    );
-    const io = new IntersectionObserver(
-      entries => entries.forEach(e => {
-        if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
-      }),
-      { threshold: 0.12 }
-    );
-    els.forEach(el => io.observe(el));
-    return () => io.disconnect();
-  }, []);
-}
-
-/* ═══════════════════════════════════════════════════════
-   MUSIC BUTTON - NO AUTOPLAY, FULL USER CONTROL
-═══════════════════════════════════════════════════════ */
-function MusicButton() {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef(null);
-
-  useEffect(() => {
-    // Create audio element - but DON'T autoplay
-    audioRef.current = new Audio('/background-music.mp3');
-    audioRef.current.loop = true; // Loop continuously
-    audioRef.current.volume = 0.3;
-    audioRef.current.preload = 'auto';
-
-    // Cleanup
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current = null;
-      }
-    };
-  }, []);
-
-  const toggleMusic = () => {
-    if (!audioRef.current) return;
-
-    if (isPlaying) {
-      // Pause the music
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
-      // Play the music (user interaction required)
-      audioRef.current.play()
-        .then(() => {
-          setIsPlaying(true);
-        })
-        .catch((error) => {
-          console.error("Playback failed:", error);
-          alert("Click again to play music. Your browser requires user interaction.");
-        });
-    }
-  };
-
-  // Animated music bars
+function MusicButton({ isPlaying, onToggle }) {
   const MusicBars = () => (
-    <div style={{
-      display: 'flex',
-      alignItems: 'flex-end',
-      gap: '3px',
-      height: '20px'
-    }}>
+    <div style={{ display: 'flex', alignItems: 'flex-end', gap: '3px', height: '20px' }}>
       {[0, 1, 2, 3].map((_, i) => (
-        <div
-          key={i}
-          style={{
-            width: '3px',
-            borderRadius: '2px',
-            background: 'white',
-            animation: isPlaying ? `barDance 0.8s ease-in-out infinite` : 'none',
-            animationDelay: `${i * 0.1}s`,
-            height: isPlaying ? '16px' : '12px',
-            transition: 'height 0.1s linear'
-          }}
-        />
+        <div key={i} style={{
+          width: '3px', borderRadius: '2px', background: 'white',
+          animation: isPlaying ? `barDance 0.8s ease-in-out infinite` : 'none',
+          animationDelay: `${i * 0.1}s`,
+          height: isPlaying ? '16px' : '12px',
+          transition: 'height 0.1s linear',
+        }} />
       ))}
     </div>
   );
 
   return (
     <button
-      onClick={toggleMusic}
-      className="music-btn"
+      onClick={onToggle}
       style={{
-        position: 'fixed',
-        bottom: '28px',
-        right: '28px',
-        zIndex: 99990,
-        width: '52px',
-        height: '52px',
-        borderRadius: '50%',
-        background: isPlaying 
-          ? 'rgba(167, 139, 250, 0.85)' 
-          : 'rgba(0, 0, 0, 0.75)',
+        position: 'fixed', bottom: '28px', right: '28px', zIndex: 99990,
+        width: '52px', height: '52px', borderRadius: '50%',
+        background: isPlaying ? 'rgba(167,139,250,0.85)' : 'rgba(0,0,0,0.75)',
         backdropFilter: 'blur(12px)',
         border: `1.5px solid ${isPlaying ? '#a78bfa' : 'rgba(255,255,255,0.3)'}`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'white',
-        cursor: 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        color: 'white', cursor: 'pointer',
         transition: 'all 0.3s ease',
-        boxShadow: isPlaying 
-          ? '0 0 20px rgba(167, 139, 250, 0.6)' 
-          : '0 2px 8px rgba(0,0,0,0.3)',
+        boxShadow: isPlaying ? '0 0 20px rgba(167,139,250,0.6)' : '0 2px 8px rgba(0,0,0,0.3)',
       }}
-      onMouseEnter={(e) => {
+      onMouseEnter={e => {
         e.currentTarget.style.transform = 'scale(1.1)';
-        e.currentTarget.style.background = isPlaying 
-          ? 'rgba(167, 139, 250, 1)' 
-          : 'rgba(167, 139, 250, 0.7)';
+        e.currentTarget.style.background = isPlaying
+          ? 'rgba(167,139,250,1)' : 'rgba(167,139,250,0.7)';
       }}
-      onMouseLeave={(e) => {
+      onMouseLeave={e => {
         e.currentTarget.style.transform = 'scale(1)';
-        e.currentTarget.style.background = isPlaying 
-          ? 'rgba(167, 139, 250, 0.85)' 
-          : 'rgba(0, 0, 0, 0.75)';
+        e.currentTarget.style.background = isPlaying
+          ? 'rgba(167,139,250,0.85)' : 'rgba(0,0,0,0.75)';
       }}
     >
       {isPlaying ? <MusicBars /> : <Music2 size={22} />}
@@ -454,60 +444,82 @@ function ParticleField({ count = 35, zIndex = 2 }) {
       raf = requestAnimationFrame(draw);
     };
     draw();
-    
+
     const handleResize = () => {
-      W = canvas.offsetWidth;
-      H = canvas.offsetHeight;
-      canvas.width = W;
-      canvas.height = H;
+      W = canvas.offsetWidth; H = canvas.offsetHeight;
+      canvas.width = W; canvas.height = H;
     };
     window.addEventListener('resize', handleResize);
-    
-    return () => {
-      cancelAnimationFrame(raf);
-      window.removeEventListener('resize', handleResize);
-    };
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', handleResize); };
   }, [count]);
 
   return (
-    <canvas
-      ref={canvasRef}
+    <canvas ref={canvasRef}
       className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ zIndex }}
-    />
+      style={{ zIndex }} />
   );
 }
 
 /* ═══════════════════════════════════════════════════════
-   SCROLL PROGRESS BAR
+   SCROLL REVEAL HOOK
 ═══════════════════════════════════════════════════════ */
-function ScrollProgress() {
-  const [pct, setPct] = useState(0);
+function useScrollReveal() {
   useEffect(() => {
-    const onScroll = () => {
-      const el = document.documentElement;
-      setPct((el.scrollTop / (el.scrollHeight - el.clientHeight)) * 100 || 0);
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
+    const els = document.querySelectorAll(
+      '.scroll-reveal,.scroll-reveal-left,.scroll-reveal-right,.scroll-reveal-scale'
+    );
+    const io = new IntersectionObserver(
+      entries => entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('visible'); io.unobserve(e.target); }
+      }),
+      { threshold: 0.12 }
+    );
+    els.forEach(el => io.observe(el));
+    return () => io.disconnect();
   }, []);
-  return (
-    <div className="fixed top-0 left-0 right-0 z-[9999]" style={{ height: 3 }}>
-      <div style={{
-        height: '100%', width: `${pct}%`,
-        background: 'linear-gradient(90deg,#a78bfa,#60a5fa,#f472b6)',
-        boxShadow: '0 0 12px rgba(167,139,250,.9)',
-        transition: 'width .05s linear',
-      }} />
-    </div>
-  );
 }
 
 /* ═══════════════════════════════════════════════════════
    HOME
 ═══════════════════════════════════════════════════════ */
 const Home = () => {
+  const [showEntry, setShowEntry] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef(null);
+
   useScrollReveal();
+
+  // Setup audio once
+  useEffect(() => {
+    audioRef.current = new Audio('/sound.mp3');
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.3;
+    audioRef.current.preload = 'auto';
+    return () => {
+      if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+    };
+  }, []);
+
+  const handleEntryChoice = (withMusic) => {
+    setShowEntry(false);
+    if (withMusic && audioRef.current) {
+      audioRef.current.play()
+        .then(() => setIsPlaying(true))
+        .catch(err => console.error('Playback failed:', err));
+    }
+  };
+
+  const toggleMusic = () => {
+    if (!audioRef.current) return;
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play()
+        .then(() => setIsPlaying(true))
+        .catch(err => console.error('Playback failed:', err));
+    }
+  };
 
   const skills = [
     { icon: <Code size={40} />,      title: 'HTML' },
@@ -529,9 +541,12 @@ const Home = () => {
   return (
     <PageTransition>
       <style>{STYLES}</style>
-      <CustomCursor />
-      <ScrollProgress />
-      <MusicButton />
+
+      {/* ── Music entry overlay ── */}
+      {showEntry && <MusicEntryScreen onChoice={handleEntryChoice} />}
+
+      {/* ── Music toggle (corner) ── */}
+      <MusicButton isPlaying={isPlaying} onToggle={toggleMusic} />
 
       <div className="min-h-screen pt-24 flex flex-col gap-10 px-4 md:px-8 pb-12">
 
@@ -539,22 +554,14 @@ const Home = () => {
             HERO SECTION
         ══════════════════════════════════════ */}
         <section className={`relative w-full ${SH} overflow-hidden rounded-3xl flex items-center`}>
-
-          {/* ── VIDEO (autoplay, loop, always playing) ── */}
-          <video
-            autoPlay muted loop playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ zIndex: 0 }}
-          >
+          <video autoPlay muted loop playsInline
+            className="absolute inset-0 w-full h-full object-cover" style={{ zIndex: 0 }}>
             <source src="/back1.mp4" type="video/mp4" />
           </video>
-
-          {/* overlays */}
           <div className="absolute inset-0 bg-gradient-to-br from-black/55 via-black/30 to-purple-900/45" style={{ zIndex: 1 }} />
           <ParticleField count={32} zIndex={2} />
           <div className="absolute inset-0 rounded-3xl border border-white/10 anim-border-pulse pointer-events-none" style={{ zIndex: 3 }} />
 
-          {/* content */}
           <div className="relative container mx-auto px-6 w-full" style={{ zIndex: 4 }}>
             <div className="grid md:grid-cols-2 gap-12 items-center">
 
@@ -573,7 +580,6 @@ const Home = () => {
                   Web Developer&nbsp;|&nbsp;AI Enthusiast&nbsp;|&nbsp;Founder of LootDukan
                 </p>
 
-                {/* stats */}
                 <div className="flex gap-8 mb-8" style={{ animation: 'fadeUp .7s .4s both' }}>
                   {stats.map((s, i) => (
                     <div key={s.label} className="text-center" style={{ animation: `countUp .6s ${.5 + i * .15}s both` }}>
@@ -602,20 +608,16 @@ const Home = () => {
                 <div className="relative flex items-center justify-center">
                   <div className="absolute w-96 h-96 rounded-full border border-white/10 anim-ring-expand" />
                   <div className="absolute w-[340px] h-[340px] rounded-full border border-purple-400/15 anim-ring-expand" style={{ animationDelay: '1.1s' }} />
-
                   {[
                     { color: '#a78bfa', dur: '7s',  delay: '0s'   },
                     { color: '#60a5fa', dur: '11s', delay: '2s'   },
                     { color: '#f472b6', dur: '9s',  delay: '4.5s' },
                   ].map((o, i) => (
                     <span key={i} className="orbit-dot" style={{
-                      background: o.color,
-                      animationDuration: o.dur,
-                      animationDelay: o.delay,
+                      background: o.color, animationDuration: o.dur, animationDelay: o.delay,
                       boxShadow: `0 0 8px 3px ${o.color}`,
                     }} />
                   ))}
-
                   <div className="w-64 h-64 md:w-80 md:h-80 rounded-full bg-gradient-to-br from-purple-500/20 to-blue-400/20 anim-float flex items-center justify-center">
                     <div className="absolute inset-4 rounded-full bg-gradient-to-br from-purple-500 to-blue-400 opacity-80 anim-pulse-glow" />
                     <div className="absolute inset-6 rounded-full bg-card flex items-center justify-center overflow-hidden z-10">
@@ -626,7 +628,6 @@ const Home = () => {
               </div>
             </div>
 
-            {/* scroll indicator */}
             <div className="absolute bottom-8 left-1/2 flex flex-col items-center gap-2"
               style={{ zIndex: 4, animation: 'scrollIndicator 2s ease-in-out infinite' }}>
               <span className="text-white/50 text-xs tracking-widest uppercase">Scroll</span>
@@ -639,16 +640,10 @@ const Home = () => {
             SKILLS SECTION
         ══════════════════════════════════════ */}
         <AnimatedSection className={`relative w-full ${SH} overflow-hidden rounded-3xl flex items-center`}>
-
-          {/* ── VIDEO (autoplay, loop, always playing) ── */}
-          <video
-            autoPlay muted loop playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ zIndex: 0 }}
-          >
+          <video autoPlay muted loop playsInline
+            className="absolute inset-0 w-full h-full object-cover" style={{ zIndex: 0 }}>
             <source src="/back2.mp4" type="video/mp4" />
           </video>
-
           <div className="absolute inset-0 bg-gradient-to-bl from-black/55 via-black/30 to-indigo-900/45" style={{ zIndex: 1 }} />
           <ParticleField count={26} zIndex={2} />
           <div className="absolute inset-0 rounded-3xl border border-white/10 anim-border-pulse pointer-events-none" style={{ animationDelay: '1s', zIndex: 3 }} />
@@ -658,25 +653,14 @@ const Home = () => {
               <SectionTitle title="My Skills" subtitle="Technologies I work with to bring ideas to life" className="text-white drop-shadow-lg" />
               <div className="glow-line w-32 mx-auto mt-2 mb-10" />
             </div>
-
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
               {skills.map((skill, i) => (
-                <div
-                  key={skill.title}
-                  className="skill-card-hover scroll-reveal-scale"
-                  style={{ transitionDelay: `${i * 0.1}s` }}
-                >
-                  <SkillCard
-                    icon={skill.icon}
-                    title={skill.title}
-                    isLearning={skill.isLearning}
-                    className="backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/20 text-white shadow-xl"
-                  />
+                <div key={skill.title} className="skill-card-hover scroll-reveal-scale" style={{ transitionDelay: `${i * 0.1}s` }}>
+                  <SkillCard icon={skill.icon} title={skill.title} isLearning={skill.isLearning}
+                    className="backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/20 text-white shadow-xl" />
                 </div>
               ))}
             </div>
-
-            {/* wave bars */}
             <div className="flex justify-center items-end gap-1.5 mt-14 h-10 scroll-reveal" style={{ transitionDelay: '.4s' }}>
               {Array.from({ length: 20 }).map((_, i) => (
                 <div key={i} className="wave-bar" style={{
@@ -693,16 +677,10 @@ const Home = () => {
             AI AGENCY SECTION
         ══════════════════════════════════════ */}
         <AnimatedSection className={`relative w-full ${SH} overflow-hidden rounded-3xl flex items-center`}>
-
-          {/* ── VIDEO (autoplay, loop, always playing) ── */}
-          <video
-            autoPlay muted loop playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-            style={{ zIndex: 0 }}
-          >
+          <video autoPlay muted loop playsInline
+            className="absolute inset-0 w-full h-full object-cover" style={{ zIndex: 0 }}>
             <source src="/back3.mp4" type="video/mp4" />
           </video>
-
           <div className="absolute inset-0 bg-gradient-to-tr from-black/65 via-black/35 to-violet-900/55" style={{ zIndex: 1 }} />
           <ParticleField count={28} zIndex={2} />
           <div className="absolute inset-0 rounded-3xl border border-white/10 anim-border-pulse pointer-events-none" style={{ animationDelay: '2s', zIndex: 3 }} />
@@ -711,7 +689,6 @@ const Home = () => {
 
           <div className="relative container mx-auto px-6 py-20 w-full flex items-center justify-center" style={{ zIndex: 4 }}>
             <div className="backdrop-blur-xl bg-white/8 hover:bg-white/12 border border-white/20 anim-border-pulse rounded-3xl p-10 md:p-16 text-center max-w-3xl w-full shadow-2xl transition-all duration-500 relative overflow-hidden scroll-reveal">
-
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
               <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full border border-purple-500/20 anim-ring-expand pointer-events-none" style={{ animationDelay: '1s' }} />
@@ -722,28 +699,20 @@ const Home = () => {
                   <Sparkles size={18} className="anim-spin-slow" />
                   Coming Soon
                 </div>
-
                 <h2 className="text-3xl md:text-5xl font-bold text-white mb-4 drop-shadow-xl scroll-reveal-left">
                   Building My <span className="text-gradient">AI Agency</span>
                 </h2>
                 <div className="glow-line w-40 mx-auto mb-6" />
-
                 <p className="text-gray-200 max-w-xl mx-auto mb-10 text-lg leading-relaxed scroll-reveal" style={{ transitionDelay: '.15s' }}>
                   I am working on building AI-based tools and websites to help people and businesses
                   leverage the power of artificial intelligence.
                 </p>
-
                 <div className="flex justify-center gap-3 mb-10">
                   {[0, 1, 2].map(i => (
                     <span key={i} className="w-2.5 h-2.5 rounded-full bg-gradient-to-br from-purple-400 to-blue-400"
-                      style={{
-                        animation: `badgeBounce 1.4s ease-in-out ${i * .18}s infinite`,
-                        boxShadow: '0 0 8px rgba(139,92,246,.6)',
-                      }}
-                    />
+                      style={{ animation: `badgeBounce 1.4s ease-in-out ${i * .18}s infinite`, boxShadow: '0 0 8px rgba(139,92,246,.6)' }} />
                   ))}
                 </div>
-
                 <Button variant="glass" size="lg" disabled
                   className="backdrop-blur-sm bg-white/10 border border-white/20 text-white shadow-lg cursor-not-allowed opacity-75">
                   <Sparkles size={16} className="mr-2 anim-spin-slow" />
