@@ -37,37 +37,38 @@ const Blog = () => {
           <SectionTitle 
             title="Blog" 
             subtitle="Thoughts, tutorials, and my learning journey"
+            className="text-white drop-shadow-lg"
           />
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {blogPosts.map((post, index) => (
               <AnimatedSection key={post.title} delay={index * 100}>
-                <article className="glass-card h-full flex flex-col hover-lift group overflow-hidden">
+                <article className="backdrop-blur-xl bg-white/10 hover:bg-white/15 border border-white/20 rounded-2xl h-full flex flex-col hover-lift group overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500">
                   {/* Image placeholder */}
-                  <div className="h-48 bg-gradient-to-br from-primary/20 to-accent/20 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-card/80 to-transparent" />
-                    <span className="absolute bottom-4 left-4 px-3 py-1 rounded-full bg-primary/20 text-primary text-sm font-medium backdrop-blur-sm">
+                  <div className="h-48 bg-gradient-to-br from-white/20 to-white/10 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
+                    <span className="absolute bottom-4 left-4 px-3 py-1 rounded-full backdrop-blur-sm bg-white/20 text-white text-sm font-medium border border-white/20 shadow-lg">
                       {post.category}
                     </span>
                   </div>
                   
                   <div className="p-6 flex flex-col flex-grow">
-                    <div className="flex items-center gap-2 text-muted-foreground text-sm mb-3">
-                      <Calendar size={14} />
+                    <div className="flex items-center gap-2 text-gray-200 text-sm mb-3 drop-shadow-sm">
+                      <Calendar size={14} className="text-white" />
                       {post.date}
                     </div>
                     
-                    <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
+                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-white transition-colors drop-shadow-lg">
                       {post.title}
                     </h3>
-                    <p className="text-muted-foreground mb-6 flex-grow">
+                    <p className="text-gray-100 mb-6 flex-grow drop-shadow-md">
                       {post.description}
                     </p>
                     
                     <Link to={`/blog/${post.slug}`}>
                       <Button 
                         variant="ghost" 
-                        className="w-fit group/btn relative overflow-hidden bg-foreground/5 hover:bg-foreground hover:text-background transition-all duration-300"
+                        className="w-fit group/btn relative overflow-hidden backdrop-blur-sm bg-white/10 hover:bg-white/20 border border-white/20 text-white hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl"
                       >
                         <span className="relative z-10 flex items-center gap-2">
                           Read More

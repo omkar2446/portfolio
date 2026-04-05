@@ -27,6 +27,45 @@
   }
 }
 
+@keyframes pulse-slow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes pulse-reverse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-pulse-reverse {
+  animation: pulse-reverse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;
