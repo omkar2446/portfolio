@@ -184,7 +184,7 @@ const STYLES = `
     top:50%; left:50%; margin:-5px 0 0 -5px;
   }
 
-  /* ── music button ── */
+  /* ── music button animation ── */
   @keyframes musicPulse {
     0%,100% { box-shadow:0 0 0 0 rgba(167,139,250,.55); }
     50%      { box-shadow:0 0 0 8px rgba(167,139,250,0); }
@@ -192,27 +192,6 @@ const STYLES = `
   @keyframes barDance {
     0%,100% { transform:scaleY(.4); }
     50%      { transform:scaleY(1); }
-  }
-  .music-btn {
-    position:fixed; bottom:28px; right:28px; z-index:9990;
-    width:44px; height:44px; border-radius:50%;
-    background:rgba(255,255,255,.12);
-    border:1.5px solid rgba(255,255,255,.3);
-    backdrop-filter:blur(12px);
-    display:flex; align-items:center; justify-content:center;
-    color:#fff; transition:transform .2s ease, background .2s ease;
-    animation:musicPulse 2.4s ease-in-out infinite;
-  }
-  .music-btn:hover {
-    transform:scale(1.12);
-    background:rgba(167,139,250,.35);
-  }
-  .music-bars {
-    display:flex; align-items:flex-end; gap:2px; height:14px;
-  }
-  .music-bar {
-    width:3px; border-radius:2px; background:#fff;
-    animation:barDance 0.8s ease-in-out infinite;
   }
 `;
 
@@ -320,6 +299,119 @@ function useScrollReveal() {
 }
 
 /* ═══════════════════════════════════════════════════════
+   MUSIC BUTTON - FIXED VERSION
+═══════════════════════════════════════════════════════ */
+function MusicButton() {
+  const [playing, setPlaying] = useState(false);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    // Create audio element with the correct path
+    // Make sure to place your music file in the public folder as "background-music.mp3"
+    audioRef.current = new Audio('/background-music.mp3');
+    audioRef.current.loop = true;
+    audioRef.current.volume = 0.3; // Set volume to 30% for better UX
+    
+    // Preload the audio
+    audioRef.current.load();
+
+    // Cleanup on component unmount
+    return () => {
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+    };
+  }, []);
+
+  const toggleMusic = () => {
+    if (!audioRef.current) return;
+
+    if (playing) {
+      audioRef.current.pause();
+      setPlaying(false);
+    } else {
+      // Play with user interaction handling
+      audioRef.current.play()
+        .then(() => {
+          setPlaying(true);
+        })
+        .catch((error) => {
+          console.error("Audio playback failed:", error);
+          // Show a user-friendly message if autoplay is blocked
+          alert("Please click again to play music. Your browser requires user interaction.");
+        });
+    }
+  };
+
+  // Animated music bars component
+  const MusicBars = () => (
+    <div className="music-bars" style={{
+      display: 'flex',
+      alignItems: 'flex-end',
+      gap: '3px',
+      height: '20px'
+    }}>
+      {[1, 2, 3, 4].map((_, i) => (
+        <div
+          key={i}
+          className="music-bar"
+          style={{
+            width: '3px',
+            borderRadius: '2px',
+            background: 'white',
+            animation: `barDance 0.8s ease-in-out infinite`,
+            animationDelay: `${i * 0.1}s`,
+            height: playing ? `${12 + Math.sin(Date.now() * 0.005 + i) * 8}px` : '12px',
+            transition: 'height 0.1s linear'
+          }}
+        />
+      ))}
+    </div>
+  );
+
+  return (
+    <button
+      onClick={toggleMusic}
+      className="music-btn"
+      style={{
+        position: 'fixed',
+        bottom: '28px',
+        right: '28px',
+        zIndex: 99990,
+        width: '48px',
+        height: '48px',
+        borderRadius: '50%',
+        background: 'rgba(0, 0, 0, 0.8)',
+        backdropFilter: 'blur(12px)',
+        border: '1.5px solid rgba(167, 139, 250, 0.6)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: 'white',
+        cursor: 'pointer',
+        transition: 'all 0.3s ease',
+        boxShadow: playing ? '0 0 20px rgba(167, 139, 250, 0.5)' : 'none',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'scale(1.1)';
+        e.currentTarget.style.background = 'rgba(167, 139, 250, 0.3)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'scale(1)';
+        e.currentTarget.style.background = 'rgba(0, 0, 0, 0.8)';
+      }}
+    >
+      {playing ? (
+        <MusicBars />
+      ) : (
+        <Music2 size={22} />
+      )}
+    </button>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
    CANVAS PARTICLE FIELD
 ═══════════════════════════════════════════════════════ */
 function ParticleField({ count = 35, zIndex = 2 }) {
@@ -368,8 +460,20 @@ function ParticleField({ count = 35, zIndex = 2 }) {
       raf = requestAnimationFrame(draw);
     };
     draw();
-    return () => cancelAnimationFrame(raf);
-  }, []);
+    
+    const handleResize = () => {
+      W = canvas.offsetWidth;
+      H = canvas.offsetHeight;
+      canvas.width = W;
+      canvas.height = H;
+    };
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', handleResize);
+    };
+  }, [count]);
 
   return (
     <canvas
@@ -402,61 +506,6 @@ function ScrollProgress() {
         transition: 'width .05s linear',
       }} />
     </div>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════
-   MUSIC PLAY / STOP BUTTON
-═══════════════════════════════════════════════════════ */
-function MusicButton() {
-  const [playing, setPlaying] = useState(false);
-  const audioRef = useRef(null);
-
-  useEffect(() => {
-    // Place your song at /public/music.mp3 (or update the path below)
-    audioRef.current = new Audio('/music.mp3');
-    audioRef.current.loop = true;
-    audioRef.current.volume = 0.35;
-    return () => {
-      audioRef.current.pause();
-      audioRef.current = null;
-    };
-  }, []);
-
-  const toggle = () => {
-    if (!audioRef.current) return;
-    if (playing) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play().catch(() => {});
-    }
-    setPlaying(p => !p);
-  };
-
-  return (
-    <button
-      onClick={toggle}
-      className="music-btn"
-      title={playing ? 'Stop music' : 'Play music'}
-      style={{ cursor: 'none' }}
-    >
-      {playing ? (
-        <span className="music-bars">
-          {[0, 1, 2, 3].map(i => (
-            <span
-              key={i}
-              className="music-bar"
-              style={{
-                height: `${[10, 14, 8, 12][i]}px`,
-                animationDelay: `${i * 0.15}s`,
-              }}
-            />
-          ))}
-        </span>
-      ) : (
-        <Music2 size={18} />
-      )}
-    </button>
   );
 }
 
