@@ -769,203 +769,106 @@ const Home = () => {
   return (
     <PageTransition>
       <style>{styles}</style>
-      <div className="min-h-screen pt-24 flex flex-col gap-8 px-4 md:px-8">
+      <div className="min-h-screen pt-24 flex flex-col gap-12 overflow-x-hidden">
 
-        {/* ════════════════════════════════════
-            HERO
-        ════════════════════════════════════ */}
-        <section
-          ref={heroRef}
-          className={`relative w-full ${sh} py-20 md:py-0 overflow-hidden rounded-3xl flex items-center section-contain`}
-        >
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
-          
-          <div className="relative z-10 container mx-auto px-6 w-full">
+        <AnimatedSection direction="up" className="relative w-full">
+           <div className={`relative w-full ${sh} overflow-hidden rounded-[3rem] shadow-2xl flex items-center`}>
+              <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+              <div className="relative z-10 max-w-7xl mx-auto w-full px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-12">
+                <div className="flex-1">
+                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/85 text-sm mb-5 backdrop-blur-sm">
+                    <span className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)] animate-pulse" />
+                    Available for projects
+                  </div>
 
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+                  <div className="mb-4">
+                    <WaterEffect>
+                      <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white reveal-content">
+                        Creative <span className="text-gradient">Developer</span>
+                      </h1>
+                    </WaterEffect>
+                  </div>
 
-              {/* ── Text col ── */}
-              <div className="order-2 md:order-1">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full
-                  bg-white/10 border border-white/20 text-white/85 text-sm mb-5 backdrop-blur-sm hero-title-reveal"
-                  style={{ opacity: 0, transform: 'translateY(-20px)' }}>
-                  <span className="w-2 h-2 rounded-full bg-green-400"
-                    style={{
-                      boxShadow:'0 0 8px 2px rgba(74,222,128,.6)',
-                      animation:'blink 2.2s ease-in-out infinite',
-                    }} />
-                  Available for projects
+                  <h2 className="text-4xl md:text-6xl font-black text-white mb-6 drop-shadow-xl leading-tight">
+                    Hi, I am <br/>
+                    <span className="text-gradient glitch-wrap" data-text="Omkar Tambe">Omkar Tambe</span>
+                  </h2>
+
+                  <p className="text-xl text-gray-100/90 mb-10 h-8 flex items-center font-semibold text-gradient">
+                    {role}<span className="cur ml-1" />
+                  </p>
+
+                  <div className="flex flex-wrap gap-4">
+                    <Link to="/contact">
+                      <Button variant="hero" size="lg" className="mag-btn backdrop-blur-sm bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/30 text-white shadow-lg">
+                        Contact Me <ArrowRight size={17} className="ml-1.5" />
+                      </Button>
+                    </Link>
+                    <Link to="/about">
+                      <Button variant="heroOutline" size="lg" className="mag-btn backdrop-blur-sm bg-transparent hover:bg-white/12 border border-white/30 text-white shadow-lg">
+                        View My Work
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
 
-                <div className="reveal-text mb-4">
-                  <WaterEffect>
-                    <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white drop-shadow-2xl reveal-content">
-                      Creative <span className="text-gradient">Developer</span>
-                    </h1>
-                  </WaterEffect>
-                </div>
-
-                <div className="reveal-text mb-3">
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white drop-shadow-xl leading-[1.08] hero-title-reveal"
-                    style={{ opacity: 0, transform: 'translateY(30px)' }}>
-                    Hi, I am
-                  </h1>
-                </div>
-                
-                <div className="reveal-text mb-6">
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.08] hero-title-reveal"
-                    style={{ opacity: 0, transform: 'translateY(30px)' }}>
-                    <span className="glitch-wrap tg" data-text="Omkar Tambe">Omkar Tambe</span>
-                  </h1>
-                </div>
-
-                <p className="text-xl text-gray-100/90 mb-8 drop-shadow-md hero-sub-reveal h-8 flex items-center"
-                  style={{ opacity: 0, transform: 'translateY(20px)' }}>
-                  <span className="tg font-semibold">{role}</span>
-                  <span className="cur" />
-                </p>
-
-                <div className="flex flex-wrap gap-4 hero-btn-reveal"
-                  style={{ opacity: 0, transform: 'translateY(20px)' }}>
-                  <Link to="/contact">
-                    <Button variant="hero" size="lg"
-                      className="mag-btn mag-btn-glow backdrop-blur-sm bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/30 text-white shadow-lg">
-                      Contact Me <ArrowRight size={17} className="ml-1.5" />
-                    </Button>
-                  </Link>
-                  <Link to="/about">
-                    <Button variant="heroOutline" size="lg"
-                      className="mag-btn backdrop-blur-sm bg-transparent hover:bg-white/12 border border-white/30 text-white shadow-lg">
-                      View My Work
-                    </Button>
-                  </Link>
-                </div>
-
-                <div ref={statsRef} className="grid grid-cols-3 gap-3 mt-10 hero-btn-reveal"
-                  style={{ opacity: 0, transform: 'translateY(20px)' }}>
-                  <StatCard num={10} suffix="+" label="Projects"  delay=".78s" visible={statsVisible} />
-                  <StatCard num={3}  suffix="+" label="Years Exp" delay=".92s" visible={statsVisible} />
-                  <StatCard num={5}  suffix="★" label="Avg Rating" delay="1.06s" visible={statsVisible} />
+                <div className="flex-1 flex justify-center items-center">
+                   <RobotFollower />
                 </div>
               </div>
-
-              {/* ── Avatar col ── */}
-              <div className="order-1 md:order-2 flex justify-center items-center hero-img-reveal"
-                style={{ opacity: 0, transform: 'scale(0.8)' }}>
-                  <RobotFollower />
-                </div>
-              </div>
-
-
-
-          </div>
-        </section>
+           </div>
+        </AnimatedSection>
 
 
         {/* ════════════════════════════════════
             SKILLS
         ════════════════════════════════════ */}
-        <AnimatedSection className={`relative w-full ${sh} overflow-hidden rounded-3xl flex items-center section-contain skills-section`}>
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
-          <div className="relative z-10 container mx-auto px-6 py-20 w-full">
-
-            <SectionTitle title="My Skills"
-              subtitle="Technologies I work with to bring ideas to life"
-              className="text-white drop-shadow-lg" />
-
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5 mt-10">
-              {skills.map((skill, i) => (
-                <div key={skill.title} className="skc skc-reveal"
-                  style={{ opacity: 0, transform: 'translateY(30px) scale(0.9)' }}>
-                  <SkillCard
-                    icon={skill.icon}
-                    title={skill.title}
-                    isLearning={skill.isLearning}
-                    className="backdrop-blur-md bg-white/10 hover:bg-white/20 border border-white/18 text-white shadow-xl"
-                  />
-                  <div className="bar-track mt-2">
-                    <div className="bar-fill"
-                      style={{
-                        '--w': skill.pct,
-                        transitionDelay:`${i * 0.1}s`,
-                      }} />
+        <AnimatedSection direction="up" className="relative w-full">
+          <div className={`relative w-full ${sh} overflow-hidden rounded-[3rem] shadow-2xl flex items-center`}>
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+            <div className="relative z-10 max-w-7xl mx-auto w-full px-8 py-20">
+              <SectionTitle title="My Skills" subtitle="Technologies I work with to bring ideas to life" className="text-white drop-shadow-lg" />
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mt-12">
+                {skills.map((skill, i) => (
+                  <div key={skill.title} className="group relative">
+                    <SkillCard icon={skill.icon} title={skill.title} isLearning={skill.isLearning} className="backdrop-blur-md bg-white/10 hover:bg-indigo-500/20 border border-white/20 text-white shadow-xl transition-all duration-300" />
+                    <div className="mt-4 h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                       <div className="h-full bg-gradient-to-r from-indigo-500 to-pink-500 transition-all duration-1000 ease-out" style={{ width: `${skill.pct * 100}%` }} />
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </AnimatedSection>
 
 
-        {/* ════════════════════════════════════
-            AI AGENCY
-        ════════════════════════════════════ */}
-        <AnimatedSection className={`relative w-full ${sh} overflow-hidden rounded-3xl flex items-center mb-8 section-contain agency-section`}>
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
-          <div className="relative z-10 container mx-auto px-6 py-20 w-full flex items-center justify-center">
-
-            <div className="backdrop-blur-2xl bg-white/10 hover:bg-white/13
-              border border-white/20 rounded-3xl
-              p-10 md:p-16 text-center max-w-3xl w-full shadow-2xl
-              transition-all duration-500 relative overflow-hidden agency-reveal"
-              style={{ opacity: 0, transform: 'translateY(40px)' }}>
-
-              <div className="agency-glow" />
-
-              {/* Shimmer edge lines */}
-              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/28 to-transparent" />
-              <div className="absolute left-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/18 to-transparent" />
-              <div className="absolute right-0 top-0 bottom-0 w-px bg-gradient-to-b from-transparent via-white/18 to-transparent" />
-
-              {/* Spinning decoration */}
-              <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-[0.07]">
-                <div style={{
-                  width:'420px', height:'420px', borderRadius:'50%',
-                  border:'1px dashed rgba(167,139,250,.9)',
-                  animation:'spinSlow 22s linear infinite',
-                  willChange:'transform',
-                }} />
+        {/* --- AI AGENCY (Uniform Size) --- */}
+        <AnimatedSection direction="up" className="relative w-full">
+          <div className={`relative w-full ${sh} overflow-hidden rounded-[3rem] shadow-2xl flex items-center mb-12`}>
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+            <div className="relative z-10 max-w-7xl mx-auto w-full px-8 py-24 flex items-center justify-center">
+              <div className="backdrop-blur-2xl bg-white/10 hover:bg-white/15 border border-white/20 rounded-[3.5rem] p-12 md:p-24 text-center max-w-4xl w-full shadow-2xl relative overflow-hidden group">
+                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 via-transparent to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-indigo-500/20 text-white font-semibold mb-8 border border-indigo-400/30">
+                  <Sparkles size={18} className="animate-spin-slow" />
+                  Coming Soon
+                </div>
+                <h2 className="text-4xl md:text-7xl font-black text-white mb-6 leading-tight">
+                  Building My <span className="text-gradient">AI Agency</span>
+                </h2>
+                <p className="text-xl text-gray-200/90 max-w-2xl mx-auto mb-12 leading-relaxed">
+                  I am creating a suite of next-generation AI-powered tools and interfaces to revolutionize how businesses interact with the digital world.
+                </p>
+                <div className="flex justify-center gap-4 mb-12">
+                   {[...Array(5)].map((_, i) => (
+                     <div key={i} className={`w-3 h-3 rounded-full ${i === 2 ? 'bg-indigo-400 shadow-[0_0_12px_rgba(129,140,248,0.8)]' : 'bg-white/30'} animate-bounce`} style={{ animationDelay: `${i * 0.1}s` }} />
+                   ))}
+                </div>
+                <Button variant="glass" size="lg" disabled className="px-10 py-7 text-lg bg-white/5 border border-white/10 text-white/50 cursor-not-allowed">
+                  Under Development
+                </Button>
               </div>
-
-              {/* Badge */}
-              <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full
-                bg-white/12 text-white font-medium mb-8 backdrop-blur-sm
-                border border-white/22 shadow-lg a-badge agency-reveal">
-                <Sparkles size={16} className="a-spin" />
-                Coming Soon
-              </div>
-
-              <h2 className="text-3xl md:text-5xl font-black text-white mb-5 drop-shadow-xl agency-reveal leading-tight">
-                Building My{' '}
-                <span className="tg">AI Agency</span>
-              </h2>
-
-              <p className="text-gray-100/90 max-w-xl mx-auto mb-10 drop-shadow-md text-lg leading-relaxed agency-reveal">
-                I am working on building AI-based tools and websites to help people and businesses
-                leverage the power of artificial intelligence.
-              </p>
-
-              {/* Bouncing dots */}
-              <div className="flex justify-center gap-3 mb-10 agency-reveal">
-                {[0,1,2,3,4].map(i => (
-                  <span key={i} className="rounded-full" style={{
-                    width: i === 2 ? '10px' : '6px',
-                    height: i === 2 ? '10px' : '6px',
-                    background: i === 2 ? 'rgba(192,132,252,.8)' : 'rgba(255,255,255,.38)',
-                    boxShadow: i === 2 ? '0 0 9px 3px rgba(192,132,252,.5)' : 'none',
-                    animation:`badgeBounce ${1.4 + i * 0.1}s ease-in-out ${i * 0.18}s infinite`,
-                    willChange:'transform',
-                  }} />
-                ))}
-              </div>
-
-              <Button variant="glass" size="lg" disabled
-                className="mag-btn backdrop-blur-sm bg-white/10 border border-white/22
-                  text-white shadow-lg cursor-not-allowed opacity-70 agency-reveal">
-                <Sparkles size={15} className="mr-2 a-spin" />
-                Coming Soon
-              </Button>
             </div>
           </div>
         </AnimatedSection>

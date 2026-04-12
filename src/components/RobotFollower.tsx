@@ -67,9 +67,9 @@ const RobotFollower: React.FC = () => {
   }, []);
 
   return (
-    <div ref={containerRef} className="relative w-[500px] h-[600px] flex items-center justify-center perspective-2000 pointer-events-none select-none">
+    <div ref={containerRef} className="relative w-full max-w-[500px] h-[400px] md:h-[600px] flex items-center justify-center perspective-2000 pointer-events-none select-none">
 
-      <div ref={robotRef} className="relative flex flex-col items-center preserve-3d">
+      <div ref={robotRef} className="relative flex flex-col items-center preserve-3d scale-[0.6] md:scale-100 transition-transform duration-500">
 
         {/* --- 3D INDUSTRIAL VOLUMETRIC HEAD --- */}
         <div ref={headRef} className="relative w-64 h-40 preserve-3d z-50 transition-transform duration-300"
