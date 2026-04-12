@@ -6,12 +6,17 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { useRef, useEffect, useState } from "react";
 import { Music2 } from "lucide-react";
+import { usePerformanceMode } from "./hooks/usePerformanceMode";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import BackgroundVideo from "./components/BackgroundVideo";
+import GlobalBackground from "./components/GlobalBackground";
+import VantaBackground from "./components/VantaBackground";
+import CustomCursor from "./components/CustomCursor";
 import Home from "./pages/Home";
+
+
+
 import About from "./pages/About";
-import Startup from "./pages/Startup";
 import Learn from "./pages/Learn";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
@@ -53,7 +58,16 @@ const MUSIC_STYLES = `
   }
   @keyframes entryOverlayOut {
     from { opacity:1; transform:scale(1); }
-    to   { opacity:0; transform:scale(1.04); }
+    to   { opacity:0; transform:scale(1.15) rotate(1deg); filter: blur(20px); }
+  }
+  @keyframes portalOutLeft {
+    to { transform: translateX(-150%) scale(0.5); opacity: 0; }
+  }
+  @keyframes portalOutRight {
+    to { transform: translateX(150%) scale(0.5); opacity: 0; }
+  }
+  @keyframes contentOut {
+    to { transform: scale(0.8) translateY(50px); opacity: 0; }
   }
 
   .entry-overlay {
@@ -63,9 +77,12 @@ const MUSIC_STYLES = `
     overflow:hidden;
   }
   .entry-overlay.leaving {
-    animation:entryOverlayOut .55s cubic-bezier(.22,1,.36,1) forwards;
+    animation:entryOverlayOut .8s cubic-bezier(.22,1,.36,1) forwards;
     pointer-events:none;
   }
+  .entry-overlay.leaving .entry-orb1 { animation: portalOutLeft .8s ease-in forwards; }
+  .entry-overlay.leaving .entry-orb2 { animation: portalOutRight .8s ease-in forwards; }
+  .entry-overlay.leaving .entry-content { animation: contentOut .6s ease-in forwards; }
   .entry-orb1 {
     position:absolute; width:420px; height:420px; border-radius:50%;
     background:radial-gradient(circle,rgba(139,92,246,.28) 0%,transparent 70%);
@@ -188,17 +205,22 @@ const MUSIC_STYLES = `
 ═══════════════════════════════════════════════════════ */
 function MusicEntryScreen({ onChoice }: { onChoice: (withMusic: boolean) => void }) {
   const [leaving, setLeaving] = useState(false);
+  const isLowPerformance = usePerformanceMode();
 
   const handleChoice = (withMusic: boolean) => {
     setLeaving(true);
-    setTimeout(() => onChoice(withMusic), 520);
+    setTimeout(() => onChoice(withMusic), 750);
   };
 
   return (
     <div className={`entry-overlay${leaving ? " leaving" : ""}`}>
-      <div className="entry-orb1" />
-      <div className="entry-orb2" />
-      <div className="entry-orb3" />
+      {!isLowPerformance && (
+        <>
+          <div className="entry-orb1" />
+          <div className="entry-orb2" />
+          <div className="entry-orb3" />
+        </>
+      )}
 
       <div className="entry-content">
         <div className="entry-icon-wrap">
@@ -344,15 +366,18 @@ const App = () => {
             <MusicFab isPlaying={isPlaying} onToggle={toggleMusic} />
           )}
 
-          <BrowserRouter>
-            <div className="min-h-screen flex flex-col transition-colors duration-300 relative">
-              <BackgroundVideo />
+          <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+            <div className="min-h-screen flex flex-col transition-colors duration-300 relative cursor-none">
+              <GlobalBackground />
+              <VantaBackground />
+              <CustomCursor />
               <Navbar />
+
+
               <main className="flex-grow relative z-0">
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/about" element={<About />} />
-                  <Route path="/startup" element={<Startup />} />
                   <Route path="/learn" element={<Learn />} />
                   <Route path="/blog" element={<Blog />} />
                   <Route path="/blog/:slug" element={<BlogPost />} />

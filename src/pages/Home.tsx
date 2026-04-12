@@ -4,11 +4,18 @@ import PageTransition from '@/components/PageTransition';
 import AnimatedSection from '@/components/AnimatedSection';
 import SectionTitle from '@/components/SectionTitle';
 import SkillCard from '@/components/SkillCard';
+import WaterEffect from '@/components/WaterEffect';
+import RobotFollower from '@/components/RobotFollower';
 import profilePhoto from '@/assets/profile-photo.png';
+
 import { useEffect, useRef, useState, useCallback } from 'react';
-import {
+import { usePerformanceMode } from '../hooks/usePerformanceMode';
+import { 
   Code, Palette, FileCode2, Atom, Terminal, Brain, Sparkles, ArrowRight,
 } from 'lucide-react';
+import gsap from 'gsap';
+
+
 
 /* ═══════════════════════════════════════════════════
    STYLES — GPU-composited animations only
@@ -54,10 +61,16 @@ const styles = `
     50%      { opacity:.48; }
   }
   @keyframes ringPulse {
-    0%   { transform:scale(.85); opacity:.55; }
-    50%  { transform:scale(1.1); opacity:.18; }
-    100% { transform:scale(.85); opacity:.55; }
+    0%   { transform:scale(.95); opacity:.3; }
+    50%  { transform:scale(1.1); opacity:.1; }
+    100% { transform:scale(.95); opacity:.3; }
   }
+
+  .perspective-1000 {
+    perspective: 1000px;
+    transform-style: preserve-3d;
+  }
+
   @keyframes orbit {
     from { transform:rotate(0deg) translateX(var(--r)) rotate(0deg); }
     to   { transform:rotate(360deg) translateX(var(--r)) rotate(-360deg); }
@@ -109,16 +122,28 @@ const styles = `
     from { opacity:0; }
     to   { opacity:1; }
   }
+  @keyframes lineReveal {
+    from { transform: translateY(100%); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes cascadeDown {
+    from { transform: translateY(-30px); opacity: 0; }
+    to   { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes scanBorder {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
 
   /* ── Utility entry classes ── */
-  .au  { animation:fadeUp    .7s cubic-bezier(.22,1,.36,1) both; }
-  .au1 { animation:fadeUp    .7s cubic-bezier(.22,1,.36,1) .12s both; }
-  .au2 { animation:fadeUp    .7s cubic-bezier(.22,1,.36,1) .26s both; }
-  .au3 { animation:fadeUp    .7s cubic-bezier(.22,1,.36,1) .40s both; }
-  .au4 { animation:fadeUp    .7s cubic-bezier(.22,1,.36,1) .54s both; }
-  .asl { animation:slideLeft  .8s cubic-bezier(.22,1,.36,1) .08s both; }
-  .asr { animation:slideRight .8s cubic-bezier(.22,1,.36,1) .18s both; }
-  .asi { animation:scaleIn    .6s cubic-bezier(.22,1,.36,1) both; }
+  .au  { opacity: 0; }
+  .asl { opacity: 0; }
+  .asr { opacity: 0; }
+  .asi { opacity: 0; }
+  .reveal-hidden { opacity: 0; transform: translateY(30px); }
+
+
 
   /* ── Continuous ── */
   .a-float   { animation:float 5.5s ease-in-out infinite; will-change:transform; }
@@ -130,11 +155,20 @@ const styles = `
 
   /* Border pulse via opacity on a pseudo layer */
   .a-border-wrap {
-    position:absolute; inset:0; border-radius:inherit;
-    border:1px solid rgba(255,255,255,.28);
+    position:absolute; inset:0;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:inherit;
     pointer-events:none;
-    animation:borderFade 3s ease-in-out infinite;
-    will-change:opacity;
+    overflow:hidden;
+  }
+  .a-border-wrap::after {
+    content:'';
+    position:absolute; inset:0;
+    background:linear-gradient(90deg,transparent,rgba(167,139,250,.3),transparent);
+    background-size:200% 100%;
+    animation:scanBorder 3s linear infinite;
+    mix-blend-mode:overlay;
+    opacity:0.6;
   }
 
   /* Shimmer gradient text */
@@ -245,7 +279,22 @@ const styles = `
     will-change:transform;
   }
   .mag-btn:hover::after { transform:translateX(100%); }
-  .mag-btn:hover { box-shadow:0 14px 38px rgba(255,255,255,.2); }
+  .mag-btn:hover { 
+    box-shadow:0 14px 38px rgba(255,255,255,.2);
+    transform: translateY(-3px) scale(1.02);
+  }
+  .mag-btn-glow {
+    animation: buttonGlow 3s infinite;
+  }
+
+  /* ── Reveal ── */
+  .reveal-text {
+    overflow: hidden;
+    height: fit-content;
+  }
+  .reveal-content {
+    animation: lineReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
 
   /* Orbiting dot — pure CSS, zero JS */
   .orbit-dot {
@@ -334,9 +383,7 @@ const styles = `
 function useVideoOpt(ref) {
   useEffect(() => {
     const v = ref.current; if (!v) return;
-    const mob = window.innerWidth < 768 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (mob) v.playbackRate = 0.6;
-
+    
     const mark = () => v.classList.add('vloaded');
     if (v.readyState >= 3) mark();
     else v.addEventListener('canplaythrough', mark, { once: true });
@@ -345,13 +392,21 @@ function useVideoOpt(ref) {
       if (e.isIntersecting) {
         if (v.preload === 'none') { v.preload = 'auto'; v.load(); }
         v.play().catch(() => {});
+        // Signal global background to pause to save resources
+        window.dispatchEvent(new CustomEvent('pause-global-video'));
       } else {
         v.pause();
+        // Signal global background to resume
+        window.dispatchEvent(new CustomEvent('resume-global-video'));
       }
     }, { threshold: 0.1 });
     io.observe(v);
 
-    return () => { v.removeEventListener('canplaythrough', mark); io.disconnect(); };
+    return () => { 
+      v.removeEventListener('canplaythrough', mark); 
+      io.disconnect(); 
+      window.dispatchEvent(new CustomEvent('resume-global-video'));
+    };
   }, [ref]);
 }
 
@@ -394,7 +449,6 @@ function useMouseParallax(ref, strength = 16) {
 
   useEffect(() => {
     const el = ref.current; if (!el) return;
-    // skip on touch devices — saves battery
     if ('ontouchstart' in window) return;
 
     const onMove = (e) => {
@@ -446,48 +500,6 @@ function useCountUp(target, duration = 1600, start = false) {
   return val;
 }
 
-/* ═══════════════════════════════════════════════════
-   VideoBg
-═══════════════════════════════════════════════════ */
-const VideoBg = ({ src, ovClass, fallClass, scanDelay }) => {
-  const vref = useRef(null);
-  useVideoOpt(vref);
-  const mob = typeof window !== 'undefined' &&
-    (window.innerWidth < 768 || /Android|iPhone|iPad|iPod/i.test(navigator.userAgent));
-  return (
-    <div className="vbg">
-      <div className={`vfall ${fallClass}`} />
-      <video
-        ref={vref}
-        autoPlay muted loop playsInline
-        preload={mob ? 'none' : 'auto'}
-        disablePictureInPicture
-        disableRemotePlayback
-      >
-        <source src={src} type="video/mp4" />
-      </video>
-      <div className={`absolute inset-0 ${ovClass}`} />
-      <div className="scanline" style={scanDelay ? { animationDelay: scanDelay } : {}} />
-    </div>
-  );
-};
-
-/* ═══════════════════════════════════════════════════
-   Sparkle dot — transform-only animation
-═══════════════════════════════════════════════════ */
-const Sp = ({ size, top, left, delay, dur, variant = 'a' }) => {
-  const name = variant === 'b' ? 'driftB' : variant === 'c' ? 'driftC' : 'driftA';
-  return (
-    <span className="sp" style={{
-      width: size, height: size, top, left,
-      animationName: name,
-      animationDelay: delay,
-      animationDuration: dur,
-      animationTimingFunction: 'ease-in-out',
-      animationIterationCount: 'infinite',
-    }} />
-  );
-};
 
 /* ═══════════════════════════════════════════════════
    OrbitDot — pure CSS orbit, zero JS overhead
@@ -530,13 +542,15 @@ const StatCard = ({ num, suffix = '', label, delay, visible }) => {
 ═══════════════════════════════════════════════════ */
 const Constellation = ({ count = 40 }) => {
   const canvasRef = useRef(null);
+  const isLowPerformance = usePerformanceMode();
 
   useEffect(() => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d', { alpha: true });
-    const mob = window.innerWidth < 768;
-    const actualCount = mob ? Math.floor(count * 0.5) : count;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2); // cap at 2x
+    
+    // In low performance mode, we reduce count even further or stick to a minimum
+    const actualCount = isLowPerformance ? Math.floor(count * 0.3) : count;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2); 
     let raf;
     let lastTime = 0;
 
@@ -565,9 +579,19 @@ const Constellation = ({ count = 40 }) => {
       r: Math.random() * 1.8 + 0.8,
     }));
 
-    const LINK_DIST = mob ? 70 : 95;
+    const LINK_DIST = isLowPerformance ? 70 : 95;
+
+    let isVisible = true;
+    const io = new IntersectionObserver(([entry]) => {
+      isVisible = entry.isIntersecting;
+    }, { threshold: 0.05 });
+    io.observe(canvas);
 
     const draw = (time) => {
+      if (!isVisible) {
+        raf = requestAnimationFrame(draw);
+        return;
+      }
       // delta-time so speed is consistent across frame rates
       const dt = Math.min((time - lastTime) / 16.67, 3);
       lastTime = time;
@@ -609,7 +633,11 @@ const Constellation = ({ count = 40 }) => {
     };
 
     raf = requestAnimationFrame(draw);
-    return () => { cancelAnimationFrame(raf); ro.disconnect(); };
+    return () => { 
+      cancelAnimationFrame(raf); 
+      ro.disconnect(); 
+      io.disconnect();
+    };
   }, [count]);
 
   return <canvas ref={canvasRef} className="constellation-canvas" />;
@@ -619,6 +647,7 @@ const Constellation = ({ count = 40 }) => {
    Main component
 ═══════════════════════════════════════════════════ */
 const Home = () => {
+  const isLowPerformance = usePerformanceMode();
   const heroRef = useRef(null);
   const tilt = useMouseParallax(heroRef, 14);
   const [statsVisible, setStatsVisible] = useState(false);
@@ -630,10 +659,89 @@ const Home = () => {
       if (e.isIntersecting) { setStatsVisible(true); io.disconnect(); }
     }, { threshold: 0.35 });
     io.observe(el);
-    return () => io.disconnect();
+
+    // Hero GSAP Entrance
+    const ctx = gsap.context(() => {
+      // Sequence: Background (handled by ThreeHeroBackground) -> Text elements
+      gsap.to('.hero-title-reveal', {
+        y: 0,
+        opacity: 1,
+        duration: 1.2,
+        stagger: 0.2,
+        ease: 'expo.out',
+        delay: 0.5
+      });
+
+      gsap.to('.hero-sub-reveal', {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        ease: 'power2.out',
+        delay: 1.4
+      });
+
+      gsap.to('.hero-btn-reveal', {
+        y: 0,
+        opacity: 1,
+        duration: 0.8,
+        stagger: 0.15,
+        ease: 'back.out(1.7)',
+        delay: 1.7
+      });
+
+      gsap.to('.hero-img-reveal', {
+        scale: 1,
+        opacity: 1,
+        duration: 1.5,
+        ease: 'elastic.out(1, 0.75)',
+        delay: 0.8
+      });
+
+      // Skills Animation
+      const skillObserver = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          gsap.to('.skc-reveal', {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: 'back.out(1.4)'
+          });
+          skillObserver.disconnect();
+        }
+      }, { threshold: 0.2 });
+      
+      const skillSection = document.querySelector('.skills-section');
+      if (skillSection) skillObserver.observe(skillSection);
+
+      // Agency Animation
+      const agencyObserver = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting) {
+          gsap.to('.agency-reveal', {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            stagger: 0.2,
+            ease: 'power3.out'
+          });
+          agencyObserver.disconnect();
+        }
+      }, { threshold: 0.3 });
+
+      const agencySection = document.querySelector('.agency-section');
+      if (agencySection) agencyObserver.observe(agencySection);
+    }, heroRef);
+
+
+    return () => {
+      io.disconnect();
+      ctx.revert();
+    };
   }, []);
 
-  const roles = ['Web Developer', 'AI Enthusiast', 'React Engineer', 'Founder @ LootDukan'];
+
+  const roles = ['Web Developer', 'AI Enthusiast', 'React Engineer'];
   const role = useTypewriter(roles, 75, 2000);
 
   const skills = [
@@ -670,19 +778,17 @@ const Home = () => {
           ref={heroRef}
           className={`relative w-full ${sh} py-20 md:py-0 overflow-hidden rounded-3xl flex items-center section-contain`}
         >
-          <VideoBg src="/back1.mp4" ovClass="ov1"
-            fallClass="bg-gradient-to-br from-purple-900 via-slate-900 to-blue-900" />
-          <Constellation count={38} />
-          <div className="a-border-wrap" />
-          {sps.map((s, i) => <Sp key={i} {...s} />)}
-
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+          
           <div className="relative z-10 container mx-auto px-6 w-full">
+
             <div className="grid md:grid-cols-2 gap-12 items-center">
 
               {/* ── Text col ── */}
-              <div className="order-2 md:order-1 asl">
+              <div className="order-2 md:order-1">
                 <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full
-                  bg-white/10 border border-white/20 text-white/85 text-sm mb-5 backdrop-blur-sm au">
+                  bg-white/10 border border-white/20 text-white/85 text-sm mb-5 backdrop-blur-sm hero-title-reveal"
+                  style={{ opacity: 0, transform: 'translateY(-20px)' }}>
                   <span className="w-2 h-2 rounded-full bg-green-400"
                     style={{
                       boxShadow:'0 0 8px 2px rgba(74,222,128,.6)',
@@ -691,22 +797,39 @@ const Home = () => {
                   Available for projects
                 </div>
 
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-3 drop-shadow-xl leading-[1.08] au1">
-                  Hi, I am
-                </h1>
-                <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-[1.08] au2">
-                  <span className="glitch-wrap tg" data-text="Omkar Tambe">Omkar Tambe</span>
-                </h1>
+                <div className="reveal-text mb-4">
+                  <WaterEffect>
+                    <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white drop-shadow-2xl reveal-content">
+                      Creative <span className="text-gradient">Developer</span>
+                    </h1>
+                  </WaterEffect>
+                </div>
 
-                <p className="text-xl text-gray-100/90 mb-8 drop-shadow-md au3 h-8 flex items-center">
+                <div className="reveal-text mb-3">
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white drop-shadow-xl leading-[1.08] hero-title-reveal"
+                    style={{ opacity: 0, transform: 'translateY(30px)' }}>
+                    Hi, I am
+                  </h1>
+                </div>
+                
+                <div className="reveal-text mb-6">
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black leading-[1.08] hero-title-reveal"
+                    style={{ opacity: 0, transform: 'translateY(30px)' }}>
+                    <span className="glitch-wrap tg" data-text="Omkar Tambe">Omkar Tambe</span>
+                  </h1>
+                </div>
+
+                <p className="text-xl text-gray-100/90 mb-8 drop-shadow-md hero-sub-reveal h-8 flex items-center"
+                  style={{ opacity: 0, transform: 'translateY(20px)' }}>
                   <span className="tg font-semibold">{role}</span>
                   <span className="cur" />
                 </p>
 
-                <div className="flex flex-wrap gap-4 au4">
+                <div className="flex flex-wrap gap-4 hero-btn-reveal"
+                  style={{ opacity: 0, transform: 'translateY(20px)' }}>
                   <Link to="/contact">
                     <Button variant="hero" size="lg"
-                      className="mag-btn backdrop-blur-sm bg-white/15 hover:bg-white/28 border border-white/30 text-white shadow-lg">
+                      className="mag-btn mag-btn-glow backdrop-blur-sm bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/30 text-white shadow-lg">
                       Contact Me <ArrowRight size={17} className="ml-1.5" />
                     </Button>
                   </Link>
@@ -718,8 +841,8 @@ const Home = () => {
                   </Link>
                 </div>
 
-                <div ref={statsRef} className="grid grid-cols-3 gap-3 mt-10 au4"
-                  style={{ animationDelay:'.72s' }}>
+                <div ref={statsRef} className="grid grid-cols-3 gap-3 mt-10 hero-btn-reveal"
+                  style={{ opacity: 0, transform: 'translateY(20px)' }}>
                   <StatCard num={10} suffix="+" label="Projects"  delay=".78s" visible={statsVisible} />
                   <StatCard num={3}  suffix="+" label="Years Exp" delay=".92s" visible={statsVisible} />
                   <StatCard num={5}  suffix="★" label="Avg Rating" delay="1.06s" visible={statsVisible} />
@@ -727,70 +850,33 @@ const Home = () => {
               </div>
 
               {/* ── Avatar col ── */}
-              <div className="order-1 md:order-2 flex justify-center items-center asr">
-                <div
-                  className="relative flex items-center justify-center"
-                  style={{
-                    transform:`perspective(900px) rotateY(${tilt.x * 0.55}deg) rotateX(${-tilt.y * 0.55}deg)`,
-                    transition:'transform .05s linear',
-                    willChange:'transform',
-                  }}
-                >
-                  {/* Rings — scale-based pulse, no layout change */}
-                  <div className="absolute w-[340px] h-[340px] md:w-[400px] md:h-[400px] rounded-full border border-white/15 a-ring" />
-                  <div className="absolute w-[300px] h-[300px] md:w-[350px] md:h-[350px] rounded-full border border-purple-400/22 a-ring2" />
-                  <div className="absolute w-[260px] h-[260px] md:w-[300px] md:h-[300px] rounded-full border border-blue-400/15 a-ring3" />
-
-                  {/* Spinning rings — rotate only */}
-                  <div className="absolute w-[380px] h-[380px] md:w-[440px] md:h-[440px] rounded-full a-spin"
-                    style={{ border:'1px dashed rgba(167,139,250,.22)' }} />
-                  <div className="absolute w-[280px] h-[280px] md:w-[330px] md:h-[330px] rounded-full a-spinccw"
-                    style={{ border:'1px dashed rgba(96,165,250,.18)' }} />
-
-                  {/* Orbiting dots — pure CSS, no JS */}
-                  <OrbitDot radius={162} size="12px" color="#c084fc" duration="6s"  delay="0s"   shadow="0 0 10px 3px rgba(192,132,252,.7)" />
-                  <OrbitDot radius={162} size="8px"  color="#38bdf8" duration="6s"  delay="-3s"  shadow="0 0 8px 2px rgba(56,189,248,.6)" />
-                  <OrbitDot radius={138} size="7px"  color="#f472b6" duration="9s"  delay="-2s"  shadow="0 0 8px 2px rgba(244,114,182,.6)" />
-                  <OrbitDot radius={138} size="5px"  color="#a78bfa" duration="9s"  delay="-5s"  shadow="0 0 6px 2px rgba(167,139,250,.5)" />
-
-                  {/* Photo disc */}
-                  <div className="w-[240px] h-[240px] md:w-[280px] md:h-[280px] rounded-full
-                    bg-gradient-to-br from-purple-500/22 to-blue-400/22 a-float
-                    flex items-center justify-center">
-                    <div className="absolute inset-5 rounded-full bg-gradient-to-br from-purple-500 to-blue-400 opacity-80 a-glow" />
-                    <div className="absolute inset-7 rounded-full bg-card flex items-center justify-center overflow-hidden z-10
-                      border-2 border-white/10">
-                      <img src={profilePhoto} alt="Omkar Tambe"
-                        className="w-full h-full object-cover object-center rounded-full" />
-                    </div>
-                  </div>
+              <div className="order-1 md:order-2 flex justify-center items-center hero-img-reveal"
+                style={{ opacity: 0, transform: 'scale(0.8)' }}>
+                  <RobotFollower />
                 </div>
               </div>
 
-            </div>
+
+
           </div>
         </section>
+
 
         {/* ════════════════════════════════════
             SKILLS
         ════════════════════════════════════ */}
-        <AnimatedSection className={`relative w-full ${sh} overflow-hidden rounded-3xl flex items-center section-contain`}>
-          <VideoBg src="/back2.mp4" ovClass="ov2"
-            fallClass="bg-gradient-to-bl from-indigo-900 via-slate-900 to-emerald-900"
-            scanDelay="2s" />
-          <Constellation count={28} />
-          <div className="a-border-wrap" style={{ animationDelay:'1s' }} />
-          {sps.slice(0, 5).map((s, i) => <Sp key={i} {...s} left={`${100 - parseInt(s.left)}%`} />)}
-
+        <AnimatedSection className={`relative w-full ${sh} overflow-hidden rounded-3xl flex items-center section-contain skills-section`}>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
           <div className="relative z-10 container mx-auto px-6 py-20 w-full">
+
             <SectionTitle title="My Skills"
               subtitle="Technologies I work with to bring ideas to life"
               className="text-white drop-shadow-lg" />
 
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-5 mt-10">
               {skills.map((skill, i) => (
-                <div key={skill.title} className="skc asi"
-                  style={{ animationDelay:`${0.07 + i * 0.1}s` }}>
+                <div key={skill.title} className="skc skc-reveal"
+                  style={{ opacity: 0, transform: 'translateY(30px) scale(0.9)' }}>
                   <SkillCard
                     icon={skill.icon}
                     title={skill.title}
@@ -801,7 +887,7 @@ const Home = () => {
                     <div className="bar-fill"
                       style={{
                         '--w': skill.pct,
-                        animationDelay:`${0.28 + i * 0.1}s`,
+                        transitionDelay:`${i * 0.1}s`,
                       }} />
                   </div>
                 </div>
@@ -810,22 +896,19 @@ const Home = () => {
           </div>
         </AnimatedSection>
 
+
         {/* ════════════════════════════════════
             AI AGENCY
         ════════════════════════════════════ */}
-        <AnimatedSection className={`relative w-full ${sh} overflow-hidden rounded-3xl flex items-center mb-8 section-contain`}>
-          <VideoBg src="/back3.mp4" ovClass="ov3"
-            fallClass="bg-gradient-to-tr from-violet-900 via-slate-900 to-purple-900"
-            scanDelay="4s" />
-          <Constellation count={42} />
-          <div className="a-border-wrap" style={{ animationDelay:'2s' }} />
-          {sps.map((s, i) => <Sp key={i} {...s} top={`${100 - parseInt(s.top)}%`} />)}
-
+        <AnimatedSection className={`relative w-full ${sh} overflow-hidden rounded-3xl flex items-center mb-8 section-contain agency-section`}>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
           <div className="relative z-10 container mx-auto px-6 py-20 w-full flex items-center justify-center">
+
             <div className="backdrop-blur-2xl bg-white/10 hover:bg-white/13
               border border-white/20 rounded-3xl
               p-10 md:p-16 text-center max-w-3xl w-full shadow-2xl
-              transition-all duration-500 relative overflow-hidden">
+              transition-all duration-500 relative overflow-hidden agency-reveal"
+              style={{ opacity: 0, transform: 'translateY(40px)' }}>
 
               <div className="agency-glow" />
 
@@ -848,23 +931,23 @@ const Home = () => {
               {/* Badge */}
               <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full
                 bg-white/12 text-white font-medium mb-8 backdrop-blur-sm
-                border border-white/22 shadow-lg a-badge au">
+                border border-white/22 shadow-lg a-badge agency-reveal">
                 <Sparkles size={16} className="a-spin" />
                 Coming Soon
               </div>
 
-              <h2 className="text-3xl md:text-5xl font-black text-white mb-5 drop-shadow-xl au1 leading-tight">
+              <h2 className="text-3xl md:text-5xl font-black text-white mb-5 drop-shadow-xl agency-reveal leading-tight">
                 Building My{' '}
                 <span className="tg">AI Agency</span>
               </h2>
 
-              <p className="text-gray-100/90 max-w-xl mx-auto mb-10 drop-shadow-md text-lg leading-relaxed au2">
+              <p className="text-gray-100/90 max-w-xl mx-auto mb-10 drop-shadow-md text-lg leading-relaxed agency-reveal">
                 I am working on building AI-based tools and websites to help people and businesses
                 leverage the power of artificial intelligence.
               </p>
 
               {/* Bouncing dots */}
-              <div className="flex justify-center gap-3 mb-10">
+              <div className="flex justify-center gap-3 mb-10 agency-reveal">
                 {[0,1,2,3,4].map(i => (
                   <span key={i} className="rounded-full" style={{
                     width: i === 2 ? '10px' : '6px',
@@ -879,13 +962,14 @@ const Home = () => {
 
               <Button variant="glass" size="lg" disabled
                 className="mag-btn backdrop-blur-sm bg-white/10 border border-white/22
-                  text-white shadow-lg cursor-not-allowed opacity-70">
+                  text-white shadow-lg cursor-not-allowed opacity-70 agency-reveal">
                 <Sparkles size={15} className="mr-2 a-spin" />
                 Coming Soon
               </Button>
             </div>
           </div>
         </AnimatedSection>
+
 
       </div>
     </PageTransition>

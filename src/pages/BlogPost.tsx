@@ -27,7 +27,7 @@ const blogPostsData: Record<string, {
 
   "JavaScript was the real game changer. At first, it felt confusing, but once I understood variables, functions, and DOM manipulation, everything started making sense. I built small projects like calculators and to-do apps, broke them, fixed them, and learned a lot in the process 😅.",
 
-  "Then came React — and that completely changed how I build applications. Components, state management, and reusable UI made development feel powerful. Using React, I started building real-world projects like LootDukan, which helped me understand how actual products are built.",
+  "Then came React — and that completely changed how I build applications. Components, state management, and reusable UI made development feel powerful. Using React, I started building real-world projects that helped me understand how actual products are built.",
 
   "If I had to give one piece of advice, it would be this: start small, build projects, and don’t be afraid to make mistakes. Every error is a lesson. Keep learning, stay consistent, and most importantly — keep coding every day 💻🔥",
 

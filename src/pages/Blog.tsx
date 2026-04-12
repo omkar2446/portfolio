@@ -3,7 +3,10 @@ import { Button } from '@/components/ui/button';
 import PageTransition from '@/components/PageTransition';
 import AnimatedSection from '@/components/AnimatedSection';
 import SectionTitle from '@/components/SectionTitle';
-import { ArrowRight, Calendar } from 'lucide-react';
+import { ArrowRight, Calendar, Hash } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
+
 
 const blogPosts = [
   {
@@ -30,6 +33,32 @@ const blogPosts = [
 ];
 
 const Blog = () => {
+  const trendingRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    if (!trendingRef.current) return;
+    const items = trendingRef.current.querySelectorAll('li');
+    gsap.set(items, { opacity: 0, scale: 0.8 });
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        gsap.to(items, {
+          opacity: 1,
+          scale: 1,
+          duration: 0.5,
+          stagger: 0.1,
+          ease: 'back.out(1.7)',
+        });
+        observer.disconnect();
+      }
+    }, { threshold: 0.2 });
+
+    observer.observe(trendingRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const topics = ['Web Development', 'React', 'Artificial Intelligence', 'Machine Learning', 'Next.js', 'UI Design'];
+
   return (
     <PageTransition>
       <div className="min-h-screen pt-24">
@@ -40,11 +69,10 @@ const Blog = () => {
             className="text-white drop-shadow-lg"
           />
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
             {blogPosts.map((post, index) => (
               <AnimatedSection key={post.title} delay={index * 100}>
                 <article className="backdrop-blur-xl bg-white/10 hover:bg-white/15 border border-white/20 rounded-2xl h-full flex flex-col hover-lift group overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500">
-                  {/* Image placeholder */}
                   <div className="h-48 bg-gradient-to-br from-white/20 to-white/10 relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
                     <span className="absolute bottom-4 left-4 px-3 py-1 rounded-full backdrop-blur-sm bg-white/20 text-white text-sm font-medium border border-white/20 shadow-lg">
@@ -81,6 +109,22 @@ const Blog = () => {
               </AnimatedSection>
             ))}
           </div>
+
+          <div className="mt-20">
+            <h4 className="text-white font-bold mb-6 flex items-center gap-2">
+              <Hash className="text-purple-400" size={20} />
+              Trending Topics
+            </h4>
+            <ul ref={trendingRef} className="flex flex-wrap gap-4">
+              {topics.map((topic, i) => (
+                <li key={i} className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white text-sm hover:bg-white/10 transition-colors cursor-pointer shadow-lg backdrop-blur-sm">
+                  {topic}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+
 
           {/* Newsletter Section */}
           

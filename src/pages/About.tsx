@@ -2,19 +2,58 @@ import { Button } from '@/components/ui/button';
 import PageTransition from '@/components/PageTransition';
 import AnimatedSection from '@/components/AnimatedSection';
 import SectionTitle from '@/components/SectionTitle';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, CheckCircle2 } from 'lucide-react';
 import profilePhoto from '@/assets/profile-photo.png';
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
+
 
 const About = () => {
+  const listRef = useRef<HTMLUListElement>(null);
+
+  useEffect(() => {
+    if (!listRef.current) return;
+    
+    const items = listRef.current.querySelectorAll('li');
+    gsap.set(items, { opacity: 0, x: -20 });
+
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        gsap.to(items, {
+          opacity: 1,
+          x: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          ease: 'power2.out',
+        });
+        observer.disconnect();
+      }
+    }, { threshold: 0.2 });
+
+    observer.observe(listRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  const coreSkills = [
+    'Modern Web Development (React, Next.js)',
+    'AI & Machine Learning Integration',
+    'Responsive Design & UI/UX Excellence',
+    'Full-Stack Architecture',
+    'Performance Optimization',
+    'Version Control & Team Collaboration'
+  ];
+
   return (
     <PageTransition>
       <div className="min-h-screen pt-24">
         <section className="container mx-auto px-6 py-20">
-          <SectionTitle 
-            title="About Me" 
-            subtitle="Get to know me better"
-            className="text-white drop-shadow-lg"
-          />
+          <div className="reveal-text mb-2">
+            <SectionTitle 
+              title="About Me" 
+              subtitle="Get to know me better"
+              className="text-white drop-shadow-lg reveal-content"
+            />
+          </div>
 
           <AnimatedSection>
             <div className="backdrop-blur-xl bg-white/10 hover:bg-white/15 border border-white/20 rounded-2xl p-8 md:p-12 shadow-2xl hover:shadow-3xl transition-all duration-500">
@@ -48,22 +87,31 @@ const About = () => {
                 <div className="space-y-6">
                   <p className="text-xl text-white leading-relaxed drop-shadow-md">
                     I am <span className="font-semibold text-white drop-shadow-lg">Omkar Tambe</span>, 
-                    founder of <span className="font-semibold text-white drop-shadow-lg">LootDukan</span>.
+                    a passionate Web Developer.
                   </p>
                   <p className="text-lg text-gray-100 leading-relaxed drop-shadow-md"> 
-                    I love building web apps, AI tools, and learning new technologies.
-                  </p>
-                  <p className="text-lg text-gray-100 leading-relaxed drop-shadow-md">
-                   A Computer Engineering student and passionate Web Developer who loves building real-world applications.
-
-  I specialize in creating modern web applications using React, Tailwind CSS, and Supabase. 
-  Currently, I am working on LootDukan — a marketplace platform that helps sellers list products and connect with buyers easily.
-
-  I enjoy learning about AI, automation, and full-stack development, and I love turning ideas into working products.
-
-  My goal is to become a skilled full-stack developer and build impactful digital solutions..
+                    I love building web apps, AI tools, and exploring new technologies.
                   </p>
                   
+                  <div className="pt-4">
+                    <h4 className="text-white font-bold mb-4 flex items-center gap-2">
+                       <CheckCircle2 className="text-purple-400" size={20} />
+                       Core Competencies
+                    </h4>
+                    <ul ref={listRef} className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {coreSkills.map((skill, i) => (
+                        <li key={i} className="flex items-center gap-2 text-gray-200 text-sm md:text-base bg-white/5 border border-white/10 rounded-lg px-3 py-2">
+                          <div className="w-1.5 h-1.5 rounded-full bg-purple-400" />
+                          {skill}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <p className="text-lg text-gray-100 leading-relaxed drop-shadow-md pt-4">
+                    A Computer Engineering student and dedicated developer who loves building real-world applications.
+                    I specialize in creating modern web applications using React, Tailwind CSS, and Supabase. 
+                  </p>
                 </div>
               </div>
             </div>
@@ -71,12 +119,11 @@ const About = () => {
 
           {/* Stats Section */}
           <AnimatedSection className="mt-20" delay={200}>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               {[
                 { value: '1+', label: 'Years Experience' },
                 { value: '10+', label: 'Projects Completed' },
-                { value: '3+', label: 'Technologies' },
-                { value: '1', label: 'Startup Founded' },
+                { value: '5+', label: 'Technologies' },
               ].map((stat, index) => (
                 <div 
                   key={stat.label} 
