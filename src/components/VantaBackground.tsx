@@ -3,8 +3,8 @@ import { usePerformanceMode } from '../hooks/usePerformanceMode';
 
 /**
  * VantaBackground Component
- * Renders the Vanta.js Birds animation using CDN scripts to ensure
- * compatibility with the specific version of Three.js it requires.
+ * Renders a sophisticated 3D NET (Network) effect in violet.
+ * This provides a modern, technical aesthetic.
  */
 const VantaBackground: React.FC = () => {
   const vantaRef = useRef<HTMLDivElement>(null);
@@ -15,7 +15,7 @@ const VantaBackground: React.FC = () => {
     if (isLowPerf) return;
 
     const loadScripts = async () => {
-      // Check if scripts already exist to avoid duplication
+      // Load Three.js
       if (!(window as any).THREE) {
         const threeScript = document.createElement('script');
         threeScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js';
@@ -24,16 +24,18 @@ const VantaBackground: React.FC = () => {
         await new Promise(resolve => threeScript.onload = resolve);
       }
 
-      if (!(window as any).VANTA || !(window as any).VANTA.BIRDS) {
+      // Load Net Vanta
+      if (!(window as any).VANTA || !(window as any).VANTA.NET) {
         const vantaScript = document.createElement('script');
-        vantaScript.src = 'https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.birds.min.js';
-        vantaScript.id = 'vanta-birds-cdn';
+        vantaScript.src = 'https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js';
+        vantaScript.id = 'vanta-net-cdn';
         document.body.appendChild(vantaScript);
         await new Promise(resolve => vantaScript.onload = resolve);
       }
 
+      // Initialize NET effect
       if (vantaRef.current && (window as any).VANTA && !vantaEffect.current) {
-        vantaEffect.current = (window as any).VANTA.BIRDS({
+        vantaEffect.current = (window as any).VANTA.NET({
           el: vantaRef.current,
           THREE: (window as any).THREE,
           mouseControls: true,
@@ -43,17 +45,12 @@ const VantaBackground: React.FC = () => {
           minWidth: 200.0,
           scale: 1.0,
           scaleMobile: 1.0,
-          backgroundColor: 0x07070a,
-          color1: 0xff0080,
-          color2: 0x00ffcc,
-          colorMode: "variance",
-          birdSize: 2.0,
-          wingSpan: 40.0,
-          speedLimit: 6.0,   // Increased speed
-          separation: 40.0,
-          alignment: 40.0,
-          cohesion: 40.0,
-          quantity: 5.0,     // Max quantity
+          color: 0x8b5cf6, // Sophisticated Violet
+          backgroundColor: 0x050508, // Dark technical background
+          points: 12.0,
+          maxDistance: 22.0,
+          spacing: 16.0,
+          showDots: true
         });
       }
     };
@@ -68,12 +65,10 @@ const VantaBackground: React.FC = () => {
     };
   }, [isLowPerf]);
 
-
   return (
     <div
       ref={vantaRef}
-      className="fixed inset-0 -z-30 pointer-events-none opacity-40 transition-opacity duration-1000"
-      style={{ background: '#0a0a0f' }}
+      className="fixed inset-0 -z-30 pointer-events-none transition-opacity duration-1000"
     />
   );
 };

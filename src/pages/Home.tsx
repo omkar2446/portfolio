@@ -10,7 +10,7 @@ import profilePhoto from '@/assets/profile-photo.png';
 
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { usePerformanceMode } from '../hooks/usePerformanceMode';
-import { 
+import {
   Code, Palette, FileCode2, Atom, Terminal, Brain, Sparkles, ArrowRight,
 } from 'lucide-react';
 import gsap from 'gsap';
@@ -383,7 +383,7 @@ const styles = `
 function useVideoOpt(ref) {
   useEffect(() => {
     const v = ref.current; if (!v) return;
-    
+
     const mark = () => v.classList.add('vloaded');
     if (v.readyState >= 3) mark();
     else v.addEventListener('canplaythrough', mark, { once: true });
@@ -391,7 +391,7 @@ function useVideoOpt(ref) {
     const io = new IntersectionObserver(([e]) => {
       if (e.isIntersecting) {
         if (v.preload === 'none') { v.preload = 'auto'; v.load(); }
-        v.play().catch(() => {});
+        v.play().catch(() => { });
         // Signal global background to pause to save resources
         window.dispatchEvent(new CustomEvent('pause-global-video'));
       } else {
@@ -402,9 +402,9 @@ function useVideoOpt(ref) {
     }, { threshold: 0.1 });
     io.observe(v);
 
-    return () => { 
-      v.removeEventListener('canplaythrough', mark); 
-      io.disconnect(); 
+    return () => {
+      v.removeEventListener('canplaythrough', mark);
+      io.disconnect();
       window.dispatchEvent(new CustomEvent('resume-global-video'));
     };
   }, [ref]);
@@ -547,10 +547,10 @@ const Constellation = ({ count = 40 }) => {
   useEffect(() => {
     const canvas = canvasRef.current; if (!canvas) return;
     const ctx = canvas.getContext('2d', { alpha: true });
-    
+
     // In low performance mode, we reduce count even further or stick to a minimum
     const actualCount = isLowPerformance ? Math.floor(count * 0.3) : count;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2); 
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     let raf;
     let lastTime = 0;
 
@@ -633,9 +633,9 @@ const Constellation = ({ count = 40 }) => {
     };
 
     raf = requestAnimationFrame(draw);
-    return () => { 
-      cancelAnimationFrame(raf); 
-      ro.disconnect(); 
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
       io.disconnect();
     };
   }, [count]);
@@ -711,7 +711,7 @@ const Home = () => {
           skillObserver.disconnect();
         }
       }, { threshold: 0.2 });
-      
+
       const skillSection = document.querySelector('.skills-section');
       if (skillSection) skillObserver.observe(skillSection);
 
@@ -745,23 +745,23 @@ const Home = () => {
   const role = useTypewriter(roles, 75, 2000);
 
   const skills = [
-    { icon: <Code size={36} />,      title: 'HTML',             pct: 0.95 },
-    { icon: <Palette size={36} />,   title: 'CSS',              pct: 0.90 },
-    { icon: <FileCode2 size={36} />, title: 'JavaScript',       pct: 0.85 },
-    { icon: <Atom size={36} />,      title: 'React',            pct: 0.82 },
-    { icon: <Terminal size={36} />,  title: 'Python',           pct: 0.75 },
-    { icon: <Brain size={36} />,     title: 'Machine Learning', pct: 0.55, isLearning: true },
+    { icon: <Code size={36} />, title: 'HTML', pct: 0.95 },
+    { icon: <Palette size={36} />, title: 'CSS', pct: 0.90 },
+    { icon: <FileCode2 size={36} />, title: 'JavaScript', pct: 0.85 },
+    { icon: <Atom size={36} />, title: 'React', pct: 0.82 },
+    { icon: <Terminal size={36} />, title: 'Python', pct: 0.75 },
+    { icon: <Brain size={36} />, title: 'Machine Learning', pct: 0.55, isLearning: true },
   ];
 
   const sps = [
-    { size:'10px', top:'10%', left:'7%',   delay:'0s',   dur:'6.5s' },
-    { size:'6px',  top:'22%', left:'82%',  delay:'1.1s', dur:'7s',   variant:'b' },
-    { size:'14px', top:'68%', left:'13%',  delay:'2.2s', dur:'8.2s', variant:'c' },
-    { size:'8px',  top:'80%', left:'74%',  delay:'0.6s', dur:'5.8s', variant:'b' },
-    { size:'5px',  top:'38%', left:'91%',  delay:'3.1s', dur:'9.4s' },
-    { size:'11px', top:'86%', left:'44%',  delay:'1.7s', dur:'7.8s', variant:'c' },
-    { size:'7px',  top:'45%', left:'3%',   delay:'2.8s', dur:'6.2s', variant:'b' },
-    { size:'9px',  top:'18%', left:'55%',  delay:'0.4s', dur:'8s' },
+    { size: '10px', top: '10%', left: '7%', delay: '0s', dur: '6.5s' },
+    { size: '6px', top: '22%', left: '82%', delay: '1.1s', dur: '7s', variant: 'b' },
+    { size: '14px', top: '68%', left: '13%', delay: '2.2s', dur: '8.2s', variant: 'c' },
+    { size: '8px', top: '80%', left: '74%', delay: '0.6s', dur: '5.8s', variant: 'b' },
+    { size: '5px', top: '38%', left: '91%', delay: '3.1s', dur: '9.4s' },
+    { size: '11px', top: '86%', left: '44%', delay: '1.7s', dur: '7.8s', variant: 'c' },
+    { size: '7px', top: '45%', left: '3%', delay: '2.8s', dur: '6.2s', variant: 'b' },
+    { size: '9px', top: '18%', left: '55%', delay: '0.4s', dur: '8s' },
   ];
 
   const sh = 'min-h-[88vh]';
@@ -772,68 +772,87 @@ const Home = () => {
       <div className="min-h-screen pt-24 flex flex-col gap-12 overflow-x-hidden">
 
         <AnimatedSection direction="up" className="relative w-full">
-           <div className={`relative w-full ${sh} overflow-hidden rounded-[3rem] shadow-2xl flex items-center`}>
-              <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
-              <div className="relative z-10 max-w-7xl mx-auto w-full px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-12">
-                <div className="flex-1">
-                  <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/85 text-sm mb-5 backdrop-blur-sm">
-                    <span className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)] animate-pulse" />
-                    Available for projects
-                  </div>
-
-                  <div className="mb-4">
-                    <WaterEffect>
-                      <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white reveal-content">
-                        Creative <span className="text-gradient">Developer</span>
-                      </h1>
-                    </WaterEffect>
-                  </div>
-
-                  <h2 className="text-4xl md:text-6xl font-black text-white mb-6 drop-shadow-xl leading-tight">
-                    Hi, I am <br/>
-                    <span className="text-gradient glitch-wrap" data-text="Omkar Tambe">Omkar Tambe</span>
-                  </h2>
-
-                  <p className="text-xl text-gray-100/90 mb-10 h-8 flex items-center font-semibold text-gradient">
-                    {role}<span className="cur ml-1" />
-                  </p>
-
-                  <div className="flex flex-wrap gap-4">
-                    <Link to="/contact">
-                      <Button variant="hero" size="lg" className="mag-btn backdrop-blur-sm bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/30 text-white shadow-lg">
-                        Contact Me <ArrowRight size={17} className="ml-1.5" />
-                      </Button>
-                    </Link>
-                    <Link to="/about">
-                      <Button variant="heroOutline" size="lg" className="mag-btn backdrop-blur-sm bg-transparent hover:bg-white/12 border border-white/30 text-white shadow-lg">
-                        View My Work
-                      </Button>
-                    </Link>
-                  </div>
+          <div className={`relative w-full ${sh} overflow-hidden rounded-[3rem] shadow-2xl flex items-center`}>
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+            <div className="relative z-10 max-w-7xl mx-auto w-full px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-12">
+              <div className="flex-1">
+                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/85 text-sm mb-5 backdrop-blur-sm">
+                  <span className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)] animate-pulse" />
+                  Available for projects
                 </div>
 
-                <div className="flex-1 flex justify-center items-center">
-                   <RobotFollower />
+                <div className="mb-4">
+                  <WaterEffect>
+                    <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white reveal-content">
+                      Creative <span className="text-gradient">Developer</span>
+                    </h1>
+                  </WaterEffect>
+                </div>
+
+                <h2 className="text-4xl md:text-6xl font-black text-white mb-6 drop-shadow-xl leading-tight">
+                  Hi, I am <br />
+                  <span className="text-gradient glitch-wrap" data-text="Omkar Tambe">Omkar Tambe</span>
+                </h2>
+
+                <p className="text-xl text-gray-100/90 mb-10 h-8 flex items-center font-semibold text-gradient">
+                  {role}<span className="cur ml-1" />
+                </p>
+
+                <div className="flex flex-wrap gap-4">
+                  <Link to="/contact">
+                    <Button variant="hero" size="lg" className="mag-btn backdrop-blur-sm bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/30 text-white shadow-lg">
+                      Contact Me <ArrowRight size={17} className="ml-1.5" />
+                    </Button>
+                  </Link>
+                  <Link to="/about">
+                    <Button variant="heroOutline" size="lg" className="mag-btn backdrop-blur-sm bg-transparent hover:bg-white/12 border border-white/30 text-white shadow-lg">
+                      View My Work
+                    </Button>
+                  </Link>
                 </div>
               </div>
-           </div>
+
+              <div className="flex-1 flex justify-center items-center">
+                <RobotFollower />
+              </div>
+            </div>
+          </div>
         </AnimatedSection>
 
 
         {/* ════════════════════════════════════
-            SKILLS
+            SKILLS (Circular Slide-In)
         ════════════════════════════════════ */}
         <AnimatedSection direction="up" className="relative w-full">
           <div className={`relative w-full ${sh} overflow-hidden rounded-[3rem] shadow-2xl flex items-center`}>
+            {/* Background Orbital Rings (Decorative) */}
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
+              <div className="w-[800px] h-[800px] border-2 border-dashed border-white/20 rounded-full animate-[spinSlow_40s_linear_infinite]" />
+              <div className="absolute w-[600px] h-[600px] border border-dotted border-white/10 rounded-full animate-[spinCCW_30s_linear_infinite]" />
+            </div>
+
             <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
+
             <div className="relative z-10 max-w-7xl mx-auto w-full px-8 py-20">
-              <SectionTitle title="My Skills" subtitle="Technologies I work with to bring ideas to life" className="text-white drop-shadow-lg" />
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mt-12">
+              <SectionTitle title="My Expertise" subtitle="A circular fusion of logic and creativity" className="text-white drop-shadow-lg" />
+
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mt-16">
                 {skills.map((skill, i) => (
-                  <div key={skill.title} className="group relative">
-                    <SkillCard icon={skill.icon} title={skill.title} isLearning={skill.isLearning} className="backdrop-blur-md bg-white/10 hover:bg-indigo-500/20 border border-white/20 text-white shadow-xl transition-all duration-300" />
-                    <div className="mt-4 h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
-                       <div className="h-full bg-gradient-to-r from-indigo-500 to-pink-500 transition-all duration-1000 ease-out" style={{ width: `${skill.pct * 100}%` }} />
+                  <div key={skill.title}
+                    className="group relative transition-all duration-700 ease-out"
+                    style={{
+                      // Handing "Circular Slide" via initial offset and stagger
+                      animation: `scaleIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
+                      animationDelay: `${i * 0.15}s`,
+                      opacity: 0
+                    }}
+                  >
+                    <SkillCard icon={skill.icon} title={skill.title} isLearning={skill.isLearning}
+                      className="backdrop-blur-md bg-white/5 hover:bg-indigo-500/20 border border-white/10 text-white shadow-xl" />
+
+                    <div className="mt-4 h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                      <div className="h-full bg-gradient-to-r from-indigo-500 to-pink-500 transition-all duration-[1.5s]"
+                        style={{ width: `${skill.pct * 100}%`, transitionDelay: `${0.5 + i * 0.1}s` }} />
                     </div>
                   </div>
                 ))}
@@ -861,9 +880,9 @@ const Home = () => {
                   I am creating a suite of next-generation AI-powered tools and interfaces to revolutionize how businesses interact with the digital world.
                 </p>
                 <div className="flex justify-center gap-4 mb-12">
-                   {[...Array(5)].map((_, i) => (
-                     <div key={i} className={`w-3 h-3 rounded-full ${i === 2 ? 'bg-indigo-400 shadow-[0_0_12px_rgba(129,140,248,0.8)]' : 'bg-white/30'} animate-bounce`} style={{ animationDelay: `${i * 0.1}s` }} />
-                   ))}
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className={`w-3 h-3 rounded-full ${i === 2 ? 'bg-indigo-400 shadow-[0_0_12px_rgba(129,140,248,0.8)]' : 'bg-white/30'} animate-bounce`} style={{ animationDelay: `${i * 0.1}s` }} />
+                  ))}
                 </div>
                 <Button variant="glass" size="lg" disabled className="px-10 py-7 text-lg bg-white/5 border border-white/10 text-white/50 cursor-not-allowed">
                   Under Development
