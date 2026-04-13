@@ -45,8 +45,8 @@ const VantaBackground: React.FC = () => {
           minWidth: 200.0,
           scale: 1.0,
           scaleMobile: 1.0,
-          color: 0x8b5cf6, // Sophisticated Violet
-          backgroundColor: 0x050508, // Dark technical background
+          color: 0x1a0505, // Deep Red Highlight
+          backgroundColor: 0x000000, 
           points: 12.0,
           maxDistance: 22.0,
           spacing: 16.0,

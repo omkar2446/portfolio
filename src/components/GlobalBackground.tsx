@@ -1,57 +1,105 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
+import * as THREE from 'three';
 
 /**
- * GlobalBackground Component
- * Renders a high-end, smooth mesh gradient with subtle movement and grain.
- * This provides the base atmosphere for the 3D background elements.
+ * GlobalBackground - The 3D Infinite Grid Edition
+ * Renders a high-performance 3D perspective grid with theme-reactive colors.
  */
 const GlobalBackground: React.FC = () => {
+    const mountRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (!mountRef.current) return;
+
+        // Scene Setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 10, 20);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        mountRef.current.appendChild(renderer.domElement);
+
+        // Infinite Grid
+        const gridSize = 100;
+        const gridDivisions = 50;
+        const grid = new THREE.GridHelper(gridSize, gridDivisions, 0xef4444, 0x222222);
+        
+        // Custom Grid Material to support color themes
+        const isDark = document.documentElement.classList.contains('dark');
+        const gridColor = isDark ? 0xef4444 : 0x3b82f6; // Red in dark, Blue in light
+        
+        (grid.material as THREE.LineBasicMaterial).color.setHex(gridColor);
+        (grid.material as THREE.LineBasicMaterial).transparent = true;
+        (grid.material as THREE.LineBasicMaterial).opacity = 0.2;
+        
+        scene.add(grid);
+
+        // Ground Glow
+        const geometry = new THREE.PlaneGeometry(gridSize, gridSize);
+        const material = new THREE.MeshBasicMaterial({
+            color: gridColor,
+            transparent: true,
+            opacity: 0.05,
+            side: THREE.DoubleSide
+        });
+        const ground = new THREE.Mesh(geometry, material);
+        ground.rotation.x = Math.PI / 2;
+        scene.add(ground);
+
+        // Animation
+        let frame = 0;
+        const animate = () => {
+            frame = requestAnimationFrame(animate);
+            
+            // Subtle movement
+            grid.position.z = (grid.position.z + 0.1) % (gridSize / gridDivisions);
+            
+            // Mouse Interaction Parallax
+            const targetX = (window as any).mouseX || 0;
+            const targetY = (window as any).mouseY || 0;
+            camera.position.x += (targetX * 0.05 - camera.position.x) * 0.05;
+            camera.position.y += (10 - targetY * 0.05 - camera.position.y) * 0.05;
+            camera.lookAt(0, 0, 0);
+
+            renderer.render(scene, camera);
+        };
+
+        const handleMouseMove = (e: MouseEvent) => {
+            (window as any).mouseX = (e.clientX - window.innerWidth / 2) * 0.1;
+            (window as any).mouseY = (e.clientY - window.innerHeight / 2) * 0.1;
+        };
+
+        const handleResize = () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('resize', handleResize);
+        animate();
+
+        return () => {
+            cancelAnimationFrame(frame);
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('resize', handleResize);
+            if (mountRef.current && renderer.domElement) {
+                mountRef.current.removeChild(renderer.domElement);
+            }
+            geometry.dispose();
+            material.dispose();
+            renderer.dispose();
+        };
+    }, []);
+
     return (
         <>
-            {/* Deep Base Layer */}
-            <div className={`fixed inset-0 -z-50 bg-[#050508]`} />
-
-            {/* Premium Mesh Gradient Blobs */}
-            <div className="fixed inset-0 -z-40 overflow-hidden pointer-events-none opacity-40">
-                {/* Primary Aura (Violet) */}
-                <div 
-                    className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] rounded-full opacity-[0.25] blur-[160px] animate-blob-slow"
-                    style={{ 
-                        background: 'radial-gradient(circle, #8b5cf6 0%, transparent 70%)',
-                    }} 
-                />
-                
-                {/* Secondary Aura (Blue) */}
-                <div 
-                    className="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] rounded-full opacity-[0.2] blur-[140px] animate-blob-reverse"
-                    style={{ 
-                        background: 'radial-gradient(circle, #3b82f6 0%, transparent 70%)',
-                        animationDelay: '-2s'
-                    }} 
-                />
-            </div>
-            
-            {/* Subtle Grain Texture Overlay */}
-            <div className="fixed inset-0 -z-20 opacity-[0.03] pointer-events-none mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
-
-            <style>{`
-                @keyframes blob-slow {
-                    0%, 100% { transform: translate(0, 0) scale(1); }
-                    33% { transform: translate(30px, -50px) scale(1.1); }
-                    66% { transform: translate(-20px, 20px) scale(0.9); }
-                }
-                @keyframes blob-reverse {
-                    0%, 100% { transform: translate(0, 0) scale(1); }
-                    33% { transform: translate(-40px, 40px) scale(1.15); }
-                    66% { transform: translate(30px, -30px) scale(0.85); }
-                }
-                .animate-blob-slow {
-                    animation: blob-slow 20s ease-in-out infinite;
-                }
-                .animate-blob-reverse {
-                    animation: blob-reverse 25s ease-in-out infinite;
-                }
-            `}</style>
+            <div className="fixed inset-0 -z-50 bg-background transition-colors duration-1000" />
+            <div ref={mountRef} className="fixed inset-0 -z-40 pointer-events-none opacity-40 mix-blend-screen dark:mix-blend-normal" />
+            <div className="fixed inset-0 -z-30 pointer-events-none bg-gradient-to-b from-transparent via-transparent to-background" />
         </>
     );
 };

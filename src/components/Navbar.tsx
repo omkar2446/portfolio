@@ -31,12 +31,15 @@ const Navbar = () => {
         }`}
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
-        <Link to="/" className="flex items-center">
-          <img
-            src="/profile.png"
-            alt="Logo"
-            className="w-10 h-10 rounded-full object-cover hover:opacity-80 transition"
-          />
+        <Link to="/" className="flex items-center group">
+          <div className="relative">
+            <img
+              src="/profile.png"
+              alt="Logo"
+              className="w-12 h-12 rounded-full object-cover ring-2 ring-white/10 group-hover:ring-primary/50 transition-all duration-500 transform group-hover:scale-110 shadow-lg"
+            />
+            <div className="absolute inset-0 rounded-full bg-primary/20 opacity-0 group-hover:opacity-100 blur-md transition-opacity duration-500" />
+          </div>
         </Link>
 
 
