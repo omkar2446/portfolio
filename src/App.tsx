@@ -6,8 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import GlobalBackground from "./components/GlobalBackground";
-import VantaBackground from "./components/VantaBackground";
+import PremiumBackground from "./components/PremiumBackground";
 import CustomCursor from "./components/CustomCursor";
 import Home from "./pages/Home";
 
@@ -23,15 +22,14 @@ const queryClient = new QueryClient();
 const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+      <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
         <TooltipProvider>
           <Toaster />
           <Sonner />
 
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-            <div className="min-h-screen flex flex-col transition-colors duration-300 relative cursor-none">
-              <GlobalBackground />
-              <VantaBackground />
+            <div className="min-h-screen flex flex-col transition-colors duration-300 relative">
+              <PremiumBackground />
               <CustomCursor />
               <Navbar />
 

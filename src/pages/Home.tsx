@@ -1,900 +1,474 @@
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import PageTransition from '@/components/PageTransition';
-import AnimatedSection from '@/components/AnimatedSection';
-import SectionTitle from '@/components/SectionTitle';
-import SkillCard from '@/components/SkillCard';
-import WaterEffect from '@/components/WaterEffect';
-import RobotFollower from '@/components/RobotFollower';
-import profilePhoto from '@/assets/profile-photo.png';
-
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { usePerformanceMode } from '../hooks/usePerformanceMode';
-import {
-  Code, Palette, FileCode2, Atom, Terminal, Brain, Sparkles, ArrowRight,
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { useRef } from 'react';
+import { 
+  Code, Palette, FileCode2, Atom, Terminal, Brain, Sparkles, ArrowRight, 
+  Github, Linkedin, Twitter, Mail
 } from 'lucide-react';
-import gsap from 'gsap';
-
-
+import { Button } from '@/components/ui/button';
 
 /* ═══════════════════════════════════════════════════
-   STYLES — GPU-composited animations only
-   All animations use transform/opacity to avoid
-   layout/paint — zero jank on any device.
+   ANIMATION VARIANTS
 ═══════════════════════════════════════════════════ */
-const styles = `
-  /* ── Entry animations (transform + opacity only) ── */
-  @keyframes fadeUp {
-    from { opacity:0; transform:translateY(40px); }
-    to   { opacity:1; transform:translateY(0); }
-  }
-  @keyframes slideLeft {
-    from { opacity:0; transform:translateX(-60px); }
-    to   { opacity:1; transform:translateX(0); }
-  }
-  @keyframes slideRight {
-    from { opacity:0; transform:translateX(60px); }
-    to   { opacity:1; transform:translateX(0); }
-  }
-  @keyframes scaleIn {
-    from { opacity:0; transform:scale(0.82) translateY(16px); }
-    to   { opacity:1; transform:scale(1) translateY(0); }
-  }
+const fadeIn = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] }
+};
 
-  /* ── Continuous loops — transform/opacity ONLY ── */
-  @keyframes float {
-    0%,100% { transform:translateY(0px) rotate(0deg); }
-    50%      { transform:translateY(-16px) rotate(1deg); }
-  }
-  @keyframes pulseOpacity {
-    0%,100% { opacity:.6; transform:scale(1); }
-    50%      { opacity:1;  transform:scale(1.06); }
-  }
-  @keyframes spinSlow  { to { transform:rotate(360deg); } }
-  @keyframes spinCCW   { to { transform:rotate(-360deg); } }
-  @keyframes shimmer {
-    0%   { background-position:-200% center; }
-    100% { background-position: 200% center; }
-  }
-  @keyframes borderFade {
-    0%,100% { opacity:.13; }
-    50%      { opacity:.48; }
-  }
-  @keyframes ringPulse {
-    0%   { transform:scale(.95); opacity:.3; }
-    50%  { transform:scale(1.1); opacity:.1; }
-    100% { transform:scale(.95); opacity:.3; }
-  }
-
-  .perspective-1000 {
-    perspective: 1000px;
-    transform-style: preserve-3d;
-  }
-
-  @keyframes orbit {
-    from { transform:rotate(0deg) translateX(var(--r)) rotate(0deg); }
-    to   { transform:rotate(360deg) translateX(var(--r)) rotate(-360deg); }
-  }
-  @keyframes blink {
-    0%,100% { opacity:1; }
-    50%      { opacity:0; }
-  }
-  @keyframes badgeBounce {
-    0%,100% { transform:translateY(0) scale(1); }
-    40%      { transform:translateY(-7px) scale(1.03); }
-    70%      { transform:translateY(-3px) scale(1.01); }
-  }
-  @keyframes scanline {
-    0%   { transform:translateY(-100%); opacity:.6; }
-    100% { transform:translateY(1200%); opacity:.4; }
-  }
-  @keyframes driftA {
-    0%,100% { transform:translate(0,0); opacity:.45; }
-    50%      { transform:translate(12px,-28px); opacity:.85; }
-  }
-  @keyframes driftB {
-    0%,100% { transform:translate(0,0); opacity:.35; }
-    50%      { transform:translate(-16px,-20px); opacity:.75; }
-  }
-  @keyframes driftC {
-    0%,100% { transform:translate(0,0); opacity:.5; }
-    50%      { transform:translate(7px,22px); opacity:.7; }
-  }
-  @keyframes glitch1 {
-    0%,92%,100% { clip-path:inset(50% 0 30% 0); transform:translateX(-3px); }
-    95%         { clip-path:inset(10% 0 60% 0); transform:translateX(3px); }
-    97%         { clip-path:inset(80% 0 5% 0);  transform:translateX(-2px); }
-  }
-  @keyframes glitch2 {
-    0%,92%,100% { clip-path:inset(20% 0 65% 0); transform:translateX(3px); }
-    95%         { clip-path:inset(55% 0 10% 0); transform:translateX(-3px); }
-    97%         { clip-path:inset(5% 0 85% 0);  transform:translateX(2px); }
-  }
-  @keyframes countUp {
-    from { opacity:0; transform:translateY(16px); }
-    to   { opacity:1; transform:translateY(0); }
-  }
-  @keyframes barGrow {
-    from { transform:scaleX(0); }
-    to   { transform:scaleX(1); }
-  }
-  @keyframes videoFadeIn {
-    from { opacity:0; }
-    to   { opacity:1; }
-  }
-  @keyframes lineReveal {
-    from { transform: translateY(100%); opacity: 0; }
-    to   { transform: translateY(0); opacity: 1; }
-  }
-  @keyframes cascadeDown {
-    from { transform: translateY(-30px); opacity: 0; }
-    to   { transform: translateY(0); opacity: 1; }
-  }
-  @keyframes scanBorder {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
-  }
-
-  /* ── Utility entry classes ── */
-  .au  { opacity: 0; }
-  .asl { opacity: 0; }
-  .asr { opacity: 0; }
-  .asi { opacity: 0; }
-  .reveal-hidden { opacity: 0; transform: translateY(30px); }
-
-
-
-  /* ── Continuous ── */
-  .a-float   { animation:float 5.5s ease-in-out infinite; will-change:transform; }
-  .a-glow    { animation:pulseOpacity 3s ease-in-out infinite; will-change:transform,opacity; }
-  .a-spin    { animation:spinSlow 8s linear infinite; will-change:transform; }
-  .a-spinccw { animation:spinCCW 12s linear infinite; will-change:transform; }
-  .a-badge   { animation:badgeBounce 2.8s ease-in-out infinite; will-change:transform; }
-  .a-blink   { animation:blink 1s step-end infinite; }
-
-  /* Border pulse via opacity on a pseudo layer */
-  .a-border-wrap {
-    position:absolute; inset:0;
-    border:1px solid rgba(255,255,255,.1);
-    border-radius:inherit;
-    pointer-events:none;
-    overflow:hidden;
-  }
-  .a-border-wrap::after {
-    content:'';
-    position:absolute; inset:0;
-    background:linear-gradient(90deg,transparent,rgba(167,139,250,.3),transparent);
-    background-size:200% 100%;
-    animation:scanBorder 3s linear infinite;
-    mix-blend-mode:overlay;
-    opacity:0.6;
-  }
-
-  /* Shimmer gradient text */
-  .tg {
-    background:linear-gradient(120deg,#c084fc,#818cf8,#38bdf8,#f472b6,#c084fc);
-    background-size:250% auto;
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-    background-clip:text;
-    animation:shimmer 4s linear infinite;
-  }
-
-  /* Glitch name */
-  .glitch-wrap { position:relative; display:inline-block; }
-  .glitch-wrap::before,
-  .glitch-wrap::after {
-    content:attr(data-text);
-    position:absolute; inset:0;
-    background:linear-gradient(120deg,#c084fc,#818cf8,#38bdf8,#f472b6,#c084fc);
-    background-size:250% auto;
-    -webkit-background-clip:text;
-    background-clip:text;
-    -webkit-text-fill-color:transparent;
-    animation:shimmer 4s linear infinite;
-    will-change:transform,clip-path;
-  }
-  .glitch-wrap::before { animation:glitch1 9s infinite, shimmer 4s linear infinite; }
-  .glitch-wrap::after  { animation:glitch2 9s .4s infinite, shimmer 4s linear infinite; }
-
-  /* ── Video BG — GPU composited ── */
-  .vbg {
-    position:absolute; inset:0; overflow:hidden;
-    border-radius:inherit;
-    /* isolate stacking context without forcing 3d */
-    isolation:isolate;
-  }
-  .vbg video {
-    position:absolute; inset:0; width:100%; height:100%;
-    object-fit:cover;
-    will-change:opacity;
-    opacity:0;
-    transition:opacity 1s ease;
-    transform:translateZ(0); /* promote to own layer */
-  }
-  .vbg video.vloaded { opacity:1; }
-  .vbg .vfall {
-    position:absolute; inset:0;
-    transition:opacity 1s ease;
-    will-change:opacity;
-  }
-  .vbg video.vloaded ~ .vfall { opacity:0; pointer-events:none; }
-
-  /* Overlays — static, no animation needed */
-  .ov1 { position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,.58)0%,rgba(0,0,0,.18)50%,rgba(67,20,120,.45)100%); }
-  .ov2 { position:absolute;inset:0;background:linear-gradient(225deg,rgba(0,0,0,.58)0%,rgba(0,0,0,.18)50%,rgba(17,24,100,.48)100%); }
-  .ov3 { position:absolute;inset:0;background:linear-gradient(45deg,rgba(0,0,0,.62)0%,rgba(0,0,0,.22)50%,rgba(76,0,130,.5)100%); }
-
-  /* Scanline — only transform, no top change */
-  .scanline {
-    position:absolute; left:0; right:0; height:2%;
-    background:linear-gradient(to bottom,transparent,rgba(255,255,255,.055),transparent);
-    pointer-events:none;
-    will-change:transform;
-    animation:scanline 7s linear infinite;
-  }
-
-  /* Sparkle dots — transform only */
-  .sp {
-    position:absolute; border-radius:50%;
-    background:rgba(255,255,255,.22);
-    pointer-events:none;
-    will-change:transform,opacity;
-    box-shadow:0 0 5px 1px rgba(255,255,255,.12);
-  }
-
-  /* Constellation canvas */
-  .constellation-canvas {
-    position:absolute; inset:0;
-    pointer-events:none; opacity:.3;
-    border-radius:inherit;
-  }
-
-  /* ── Skill cards ── */
-  .skc {
-    transition:transform .35s cubic-bezier(.22,1,.36,1),
-               box-shadow .35s ease;
-    will-change:transform;
-  }
-  .skc:hover {
-    transform:translateY(-12px) scale(1.07) rotate(-1deg);
-    box-shadow:0 24px 52px rgba(139,92,246,.4);
-  }
-
-  /* ── Magnetic button ── */
-  .mag-btn {
-    position:relative; overflow:hidden;
-    transition:transform .22s cubic-bezier(.22,1,.36,1),
-               box-shadow .22s ease;
-    will-change:transform;
-  }
-  .mag-btn::after {
-    content:'';
-    position:absolute; inset:-2px;
-    background:linear-gradient(120deg,rgba(255,255,255,0),rgba(255,255,255,.11),rgba(255,255,255,0));
-    transform:translateX(-100%);
-    transition:transform .5s ease;
-    pointer-events:none;
-    will-change:transform;
-  }
-  .mag-btn:hover::after { transform:translateX(100%); }
-  .mag-btn:hover { 
-    box-shadow:0 14px 38px rgba(255,255,255,.2);
-    transform: translateY(-3px) scale(1.02);
-  }
-  .mag-btn-glow {
-    animation: buttonGlow 3s infinite;
-  }
-
-  /* ── Reveal ── */
-  .reveal-text {
-    overflow: hidden;
-    height: fit-content;
-  }
-  .reveal-content {
-    animation: lineReveal 0.8s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-
-  /* Orbiting dot — pure CSS, zero JS */
-  .orbit-dot {
-    position:absolute; top:50%; left:50%;
-    border-radius:50%;
-    margin:calc(var(--s) / -2) 0 0 calc(var(--s) / -2);
-    will-change:transform;
-    animation:orbit var(--dur) linear var(--delay) infinite;
-  }
-
-  /* Stats */
-  .stat-card {
-    backdrop-filter:blur(10px);
-    -webkit-backdrop-filter:blur(10px);
-    background:rgba(255,255,255,.08);
-    border:1px solid rgba(255,255,255,.18);
-    border-radius:16px;
-    padding:.9rem 1.3rem;
-    text-align:center;
-    transition:transform .3s ease, background .3s ease;
-    animation:countUp .6s cubic-bezier(.22,1,.36,1) both;
-    will-change:transform;
-  }
-  .stat-card:hover {
-    transform:translateY(-5px) scale(1.03);
-    background:rgba(255,255,255,.13);
-  }
-  .stat-num { font-size:2rem; font-weight:800; line-height:1; margin-bottom:.22rem; }
-  .stat-lbl { font-size:.78rem; opacity:.7; letter-spacing:.07em; text-transform:uppercase; }
-
-  /* Agency card inner glow */
-  .agency-glow {
-    position:absolute; inset:0; border-radius:inherit;
-    background:radial-gradient(ellipse at 50% 0%,rgba(139,92,246,.16),transparent 68%);
-    pointer-events:none;
-    animation:pulseOpacity 4s ease-in-out infinite;
-    will-change:opacity;
-  }
-
-  /* Progress bars — scaleX instead of width (cheaper) */
-  .bar-track {
-    height:3px; background:rgba(255,255,255,.12);
-    border-radius:99px; margin-top:6px; overflow:hidden;
-  }
-  .bar-fill {
-    height:100%; width:100%;
-    background:linear-gradient(90deg,#a78bfa,#60a5fa);
-    border-radius:99px;
-    transform-origin:left center;
-    transform:scaleX(var(--w));
-    animation:barGrow .85s cubic-bezier(.22,1,.36,1) both;
-    will-change:transform;
-  }
-
-  /* Typewriter cursor */
-  .cur {
-    display:inline-block; width:2px; height:1em;
-    background:rgba(255,255,255,.85); margin-left:3px;
-    vertical-align:middle;
-    animation:blink 1s step-end infinite;
-  }
-
-  /* Section contain — isolates paint/layout per section */
-  .section-contain {
-    contain:layout style paint;
-  }
-
-  /* Ring animations — scale only ── */
-  .a-ring  { animation:ringPulse 3.5s ease-in-out infinite; will-change:transform,opacity; }
-  .a-ring2 { animation:ringPulse 3.5s ease-in-out 1.1s infinite; will-change:transform,opacity; }
-  .a-ring3 { animation:ringPulse 4.2s ease-in-out 0.5s infinite; will-change:transform,opacity; }
-
-  /* Reduce motion — global kill switch */
-  @media (prefers-reduced-motion:reduce) {
-    *,*::before,*::after {
-      animation-duration:.01ms!important;
-      animation-iteration-count:1!important;
-      transition-duration:.01ms!important;
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1
     }
   }
-`;
+};
 
 /* ═══════════════════════════════════════════════════
-   useVideoOptimization — lazy + mobile throttle
+   COMPONENTS
 ═══════════════════════════════════════════════════ */
-function useVideoOpt(ref) {
-  useEffect(() => {
-    const v = ref.current; if (!v) return;
 
-    const mark = () => v.classList.add('vloaded');
-    if (v.readyState >= 3) mark();
-    else v.addEventListener('canplaythrough', mark, { once: true });
-
-    const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
-        if (v.preload === 'none') { v.preload = 'auto'; v.load(); }
-        v.play().catch(() => { });
-        // Signal global background to pause to save resources
-        window.dispatchEvent(new CustomEvent('pause-global-video'));
-      } else {
-        v.pause();
-        // Signal global background to resume
-        window.dispatchEvent(new CustomEvent('resume-global-video'));
-      }
-    }, { threshold: 0.1 });
-    io.observe(v);
-
-    return () => {
-      v.removeEventListener('canplaythrough', mark);
-      io.disconnect();
-      window.dispatchEvent(new CustomEvent('resume-global-video'));
-    };
-  }, [ref]);
-}
-
-/* ═══════════════════════════════════════════════════
-   useTypewriter
-═══════════════════════════════════════════════════ */
-function useTypewriter(words, speed = 80, pause = 1800) {
-  const [display, setDisplay] = useState('');
-  const [wi, setWi] = useState(0);
-  const [deleting, setDeleting] = useState(false);
-
-  useEffect(() => {
-    const word = words[wi];
-    let timeout;
-    if (!deleting && display === word) {
-      timeout = setTimeout(() => setDeleting(true), pause);
-    } else if (deleting && display === '') {
-      setDeleting(false);
-      setWi(p => (p + 1) % words.length);
-    } else {
-      timeout = setTimeout(
-        () => setDisplay(p => deleting ? p.slice(0, -1) : word.slice(0, p.length + 1)),
-        deleting ? speed / 2 : speed,
-      );
-    }
-    return () => clearTimeout(timeout);
-  }, [display, deleting, wi, words, speed, pause]);
-
-  return display;
-}
-
-/* ═══════════════════════════════════════════════════
-   useMouseParallax — smooth lerp, RAF-based
-═══════════════════════════════════════════════════ */
-function useMouseParallax(ref, strength = 16) {
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const raf = useRef(null);
-  const target = useRef({ x: 0, y: 0 });
-  const current = useRef({ x: 0, y: 0 });
-
-  useEffect(() => {
-    const el = ref.current; if (!el) return;
-    if ('ontouchstart' in window) return;
-
-    const onMove = (e) => {
-      const r = el.getBoundingClientRect();
-      target.current.x = ((e.clientX - r.left - r.width / 2) / (r.width / 2)) * strength;
-      target.current.y = ((e.clientY - r.top - r.height / 2) / (r.height / 2)) * strength;
-    };
-    const onLeave = () => { target.current = { x: 0, y: 0 }; };
-
-    const loop = () => {
-      const lerpFactor = 0.07;
-      current.current.x += (target.current.x - current.current.x) * lerpFactor;
-      current.current.y += (target.current.y - current.current.y) * lerpFactor;
-      setTilt({ x: current.current.x, y: current.current.y });
-      raf.current = requestAnimationFrame(loop);
-    };
-
-    el.addEventListener('mousemove', onMove, { passive: true });
-    el.addEventListener('mouseleave', onLeave);
-    raf.current = requestAnimationFrame(loop);
-
-    return () => {
-      el.removeEventListener('mousemove', onMove);
-      el.removeEventListener('mouseleave', onLeave);
-      cancelAnimationFrame(raf.current);
-    };
-  }, [ref, strength]);
-
-  return tilt;
-}
-
-/* ═══════════════════════════════════════════════════
-   useCountUp
-═══════════════════════════════════════════════════ */
-function useCountUp(target, duration = 1600, start = false) {
-  const [val, setVal] = useState(0);
-  useEffect(() => {
-    if (!start) return;
-    let startTime = null;
-    const step = (ts) => {
-      if (!startTime) startTime = ts;
-      const progress = Math.min((ts - startTime) / duration, 1);
-      const ease = 1 - Math.pow(1 - progress, 3);
-      setVal(Math.floor(ease * target));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [target, duration, start]);
-  return val;
-}
-
-
-/* ═══════════════════════════════════════════════════
-   OrbitDot — pure CSS orbit, zero JS overhead
-═══════════════════════════════════════════════════ */
-const OrbitDot = ({ radius, size, color, duration, delay, shadow }) => (
-  <div
-    className="orbit-dot"
-    style={{
-      '--r': `${radius}px`,
-      '--s': size,
-      '--dur': duration,
-      '--delay': delay,
-      width: size,
-      height: size,
-      background: color,
-      boxShadow: shadow,
-    }}
-  />
+const SectionHeading = ({ title, subtitle }: { title: string, subtitle?: string }) => (
+  <motion.div 
+    variants={fadeIn}
+    initial="initial"
+    whileInView="animate"
+    viewport={{ once: true }}
+    className="mb-16"
+  >
+    <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">{title}</h2>
+    {subtitle && <p className="text-lg text-foreground/60 max-w-2xl">{subtitle}</p>}
+  </motion.div>
 );
 
-/* ═══════════════════════════════════════════════════
-   StatCard
-═══════════════════════════════════════════════════ */
-const StatCard = ({ num, suffix = '', label, delay, visible }) => {
-  const val = useCountUp(num, 1500, visible);
-  return (
-    <div className="stat-card" style={{ animationDelay: delay }}>
-      <div className="stat-num text-white">
-        <span className="tg">{val}{suffix}</span>
-      </div>
-      <div className="stat-lbl text-white/70">{label}</div>
-    </div>
-  );
-};
-
-/* ═══════════════════════════════════════════════════
-   Constellation canvas — optimised RAF loop
-   Uses devicePixelRatio for crisp rendering
-   Reduces dot count on mobile
-═══════════════════════════════════════════════════ */
-const Constellation = ({ count = 40 }) => {
-  const canvasRef = useRef(null);
-  const isLowPerformance = usePerformanceMode();
-
-  useEffect(() => {
-    const canvas = canvasRef.current; if (!canvas) return;
-    const ctx = canvas.getContext('2d', { alpha: true });
-
-    // In low performance mode, we reduce count even further or stick to a minimum
-    const actualCount = isLowPerformance ? Math.floor(count * 0.3) : count;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    let raf;
-    let lastTime = 0;
-
-    const resize = () => {
-      const w = canvas.offsetWidth;
-      const h = canvas.offsetHeight;
-      canvas.width = w * dpr;
-      canvas.height = h * dpr;
-      ctx.scale(dpr, dpr);
-      canvas.style.width = w + 'px';
-      canvas.style.height = h + 'px';
-    };
-    resize();
-
-    const ro = new ResizeObserver(resize);
-    ro.observe(canvas);
-
-    const W = () => canvas.offsetWidth;
-    const H = () => canvas.offsetHeight;
-
-    const dots = Array.from({ length: actualCount }, () => ({
-      x: Math.random() * W(),
-      y: Math.random() * H(),
-      vx: (Math.random() - .5) * .35,
-      vy: (Math.random() - .5) * .35,
-      r: Math.random() * 1.8 + 0.8,
-    }));
-
-    const LINK_DIST = isLowPerformance ? 70 : 95;
-
-    let isVisible = true;
-    const io = new IntersectionObserver(([entry]) => {
-      isVisible = entry.isIntersecting;
-    }, { threshold: 0.05 });
-    io.observe(canvas);
-
-    const draw = (time) => {
-      if (!isVisible) {
-        raf = requestAnimationFrame(draw);
-        return;
-      }
-      // delta-time so speed is consistent across frame rates
-      const dt = Math.min((time - lastTime) / 16.67, 3);
-      lastTime = time;
-
-      ctx.clearRect(0, 0, W(), H());
-
-      const w = W(); const h = H();
-      for (const d of dots) {
-        d.x += d.vx * dt; d.y += d.vy * dt;
-        if (d.x < 0) { d.x = 0; d.vx *= -1; }
-        else if (d.x > w) { d.x = w; d.vx *= -1; }
-        if (d.y < 0) { d.y = 0; d.vy *= -1; }
-        else if (d.y > h) { d.y = h; d.vy *= -1; }
-
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255,255,255,.55)';
-        ctx.fill();
-      }
-
-      for (let i = 0; i < dots.length - 1; i++) {
-        for (let j = i + 1; j < dots.length; j++) {
-          const dx = dots[i].x - dots[j].x;
-          const dy = dots[i].y - dots[j].y;
-          const dist2 = dx * dx + dy * dy;
-          if (dist2 < LINK_DIST * LINK_DIST) {
-            const dist = Math.sqrt(dist2);
-            ctx.beginPath();
-            ctx.moveTo(dots[i].x, dots[i].y);
-            ctx.lineTo(dots[j].x, dots[j].y);
-            ctx.strokeStyle = `rgba(180,160,255,${(1 - dist / LINK_DIST) * .4})`;
-            ctx.lineWidth = .5;
-            ctx.stroke();
-          }
-        }
-      }
-
-      raf = requestAnimationFrame(draw);
-    };
-
-    raf = requestAnimationFrame(draw);
-    return () => {
-      cancelAnimationFrame(raf);
-      ro.disconnect();
-      io.disconnect();
-    };
-  }, [count]);
-
-  return <canvas ref={canvasRef} className="constellation-canvas" />;
-};
-
-/* ═══════════════════════════════════════════════════
-   Main component
-═══════════════════════════════════════════════════ */
 const Home = () => {
-  const isLowPerformance = usePerformanceMode();
   const heroRef = useRef(null);
-  const tilt = useMouseParallax(heroRef, 14);
-  const [statsVisible, setStatsVisible] = useState(false);
-  const statsRef = useRef(null);
-
-  useEffect(() => {
-    const el = statsRef.current; if (!el) return;
-    const io = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { setStatsVisible(true); io.disconnect(); }
-    }, { threshold: 0.35 });
-    io.observe(el);
-
-    // Hero GSAP Entrance
-    const ctx = gsap.context(() => {
-      // Sequence: Background (handled by ThreeHeroBackground) -> Text elements
-      gsap.to('.hero-title-reveal', {
-        y: 0,
-        opacity: 1,
-        duration: 1.2,
-        stagger: 0.2,
-        ease: 'expo.out',
-        delay: 0.5
-      });
-
-      gsap.to('.hero-sub-reveal', {
-        y: 0,
-        opacity: 1,
-        duration: 0.8,
-        ease: 'power2.out',
-        delay: 1.4
-      });
-
-      gsap.to('.hero-btn-reveal', {
-        y: 0,
-        opacity: 1,
-        duration: 0.8,
-        stagger: 0.15,
-        ease: 'back.out(1.7)',
-        delay: 1.7
-      });
-
-      gsap.to('.hero-img-reveal', {
-        scale: 1,
-        opacity: 1,
-        duration: 1.5,
-        ease: 'elastic.out(1, 0.75)',
-        delay: 0.8
-      });
-
-      // Skills Animation
-      const skillObserver = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-          gsap.to('.skc-reveal', {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 0.8,
-            stagger: 0.1,
-            ease: 'back.out(1.4)'
-          });
-          skillObserver.disconnect();
-        }
-      }, { threshold: 0.2 });
-
-      const skillSection = document.querySelector('.skills-section');
-      if (skillSection) skillObserver.observe(skillSection);
-
-      // Agency Animation
-      const agencyObserver = new IntersectionObserver((entries) => {
-        if (entries[0].isIntersecting) {
-          gsap.to('.agency-reveal', {
-            y: 0,
-            opacity: 1,
-            duration: 1,
-            stagger: 0.2,
-            ease: 'power3.out'
-          });
-          agencyObserver.disconnect();
-        }
-      }, { threshold: 0.3 });
-
-      const agencySection = document.querySelector('.agency-section');
-      if (agencySection) agencyObserver.observe(agencySection);
-    }, heroRef);
-
-
-    return () => {
-      io.disconnect();
-      ctx.revert();
-    };
-  }, []);
-
-
-  const roles = ['Web Developer', 'AI Enthusiast', 'React Engineer'];
-  const role = useTypewriter(roles, 75, 2000);
+  const { scrollYProgress } = useScroll();
+  const scale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
 
   const skills = [
-    { icon: <Code size={36} />, title: 'HTML', pct: 0.95 },
-    { icon: <Palette size={36} />, title: 'CSS', pct: 0.90 },
-    { icon: <FileCode2 size={36} />, title: 'JavaScript', pct: 0.85 },
-    { icon: <Atom size={36} />, title: 'React', pct: 0.82 },
-    { icon: <Terminal size={36} />, title: 'Python', pct: 0.75 },
-    { icon: <Brain size={36} />, title: 'Machine Learning', pct: 0.55, isLearning: true },
+    { icon: <Code size={24} />, title: 'HTML', pct: 95 },
+    { icon: <Palette size={24} />, title: 'CSS', pct: 90 },
+    { icon: <FileCode2 size={24} />, title: 'JavaScript', pct: 85 },
+    { icon: <Atom size={24} />, title: 'React', pct: 82 },
+    { icon: <Terminal size={24} />, title: 'Python', pct: 75 },
+    { icon: <Brain size={24} />, title: 'Machine Learning', pct: 55 },
   ];
 
-  const sps = [
-    { size: '10px', top: '10%', left: '7%', delay: '0s', dur: '6.5s' },
-    { size: '6px', top: '22%', left: '82%', delay: '1.1s', dur: '7s', variant: 'b' },
-    { size: '14px', top: '68%', left: '13%', delay: '2.2s', dur: '8.2s', variant: 'c' },
-    { size: '8px', top: '80%', left: '74%', delay: '0.6s', dur: '5.8s', variant: 'b' },
-    { size: '5px', top: '38%', left: '91%', delay: '3.1s', dur: '9.4s' },
-    { size: '11px', top: '86%', left: '44%', delay: '1.7s', dur: '7.8s', variant: 'c' },
-    { size: '7px', top: '45%', left: '3%', delay: '2.8s', dur: '6.2s', variant: 'b' },
-    { size: '9px', top: '18%', left: '55%', delay: '0.4s', dur: '8s' },
+  const projects = [
+    {
+      title: 'AI Portfolio Architect',
+      desc: 'A premium platform for developers to build state-of-the-art portfolios with AI assistance.',
+      tech: ['React', 'Three.js', 'Framer Motion'],
+      link: '#'
+    },
+    {
+      title: 'NexGen SaaS Platform',
+      desc: 'Modern dashboard for next-generation businesses with real-time analytics.',
+      tech: ['Next.js', 'Tailwind', 'PostgreSQL'],
+      link: '#'
+    },
+    {
+      title: 'E-Commerce Ultra',
+      desc: 'High-performance e-commerce engine with smooth transitions and premium feel.',
+      tech: ['React', 'Node.js', 'Stripe'],
+      link: '#'
+    }
   ];
 
-  const sh = 'min-h-[88vh]';
+  const experience = [
+    {
+      year: '2024 - Present',
+      title: 'Lead Frontend Engineer',
+      company: 'TechFlow Systems',
+      desc: 'Leading the development of high-performance React applications and design systems.'
+    },
+    {
+      year: '2022 - 2024',
+      title: 'Full Stack Developer',
+      company: 'Innovate AI',
+      desc: 'Built scalable AI-driven interfaces and optimized backend performance.'
+    },
+    {
+      year: '2020 - 2022',
+      title: 'Junior Web Developer',
+      company: 'Creative Media',
+      desc: 'Developed interactive web experiences for global brands.'
+    }
+  ];
 
   return (
-    <PageTransition>
-      <style>{styles}</style>
-      <div className="min-h-screen pt-24 flex flex-col gap-12 overflow-x-hidden">
+    <div className="overflow-x-hidden">
+      {/* ════════════════════════════════════
+          HERO SECTION
+      ════════════════════════════════════ */}
+      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center pt-20 overflow-hidden">
+        {/* Background Gradients */}
+        <div className="absolute inset-0 z-0">
+          <motion.div 
+            animate={{ 
+              scale: [1, 1.2, 1],
+              opacity: [0.3, 0.5, 0.3]
+            }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-1/4 -left-1/4 w-[600px] h-[600px] bg-primary/20 blur-[120px] rounded-full" 
+          />
+          <motion.div 
+            animate={{ 
+              scale: [1.2, 1, 1.2],
+              opacity: [0.2, 0.4, 0.2]
+            }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute bottom-1/4 -right-1/4 w-[500px] h-[500px] bg-blue-400/20 blur-[100px] rounded-full" 
+          />
+        </div>
 
-        <AnimatedSection direction="up" className="relative w-full">
-          <div className={`relative w-full ${sh} overflow-hidden rounded-[3rem] shadow-2xl flex items-center`}>
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
-            <div className="relative z-10 max-w-7xl mx-auto w-full px-6 md:px-12 flex flex-col md:flex-row items-center justify-between gap-12">
-              <div className="flex-1">
-                <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-white/85 text-sm mb-5 backdrop-blur-sm">
-                  <span className="w-2 h-2 rounded-full bg-green-400 shadow-[0_0_8px_rgba(74,222,128,0.6)] animate-pulse" />
-                  Available for projects
-                </div>
+        <motion.div 
+          style={{ scale, opacity }}
+          className="container-max relative z-10 text-center"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary text-sm font-medium mb-8"
+          >
+            <Sparkles size={14} />
+            <span>Available for new projects</span>
+          </motion.div>
 
-                <div className="mb-4">
-                  <WaterEffect>
-                    <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight text-white reveal-content">
-                      Creative <span className="text-gradient">Developer</span>
-                    </h1>
-                  </WaterEffect>
-                </div>
+          <motion.h1 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="text-5xl md:text-8xl font-black mb-6 tracking-tight leading-[1.1]"
+          >
+            Building the <span className="text-primary italic">future</span> of <br /> 
+            digital experiences.
+          </motion.h1>
 
-                <h2 className="text-4xl md:text-6xl font-black text-white mb-6 drop-shadow-xl leading-tight">
-                  Hi, I am <br />
-                  <span className="text-gradient glitch-wrap" data-text="Omkar Tambe">Omkar Tambe</span>
-                </h2>
+          <motion.p 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+            className="text-lg md:text-2xl text-foreground/60 max-w-3xl mx-auto mb-12 font-medium"
+          >
+            I am a Frontend Engineer specializing in high-end web experiences, 
+            blending technical precision with creative design.
+          </motion.p>
 
-                <p className="text-xl text-gray-100/90 mb-10 h-8 flex items-center font-semibold text-gradient">
-                  {role}<span className="cur ml-1" />
-                </p>
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="flex flex-wrap items-center justify-center gap-4"
+          >
+            <Button className="btn-premium px-10 py-7 text-lg">
+              View Projects
+            </Button>
+            <Button variant="ghost" className="px-10 py-7 text-lg font-bold rounded-full hover:bg-white/5">
+              Contact Me
+            </Button>
+          </motion.div>
+        </motion.div>
 
-                <div className="flex flex-wrap gap-4">
-                  <Link to="/contact">
-                    <Button variant="hero" size="lg" className="mag-btn backdrop-blur-sm bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/30 text-white shadow-lg">
-                      Contact Me <ArrowRight size={17} className="ml-1.5" />
-                    </Button>
-                  </Link>
-                  <Link to="/about">
-                    <Button variant="heroOutline" size="lg" className="mag-btn backdrop-blur-sm bg-transparent hover:bg-white/12 border border-white/30 text-white shadow-lg">
-                      View My Work
-                    </Button>
-                  </Link>
+        {/* Scroll Indicator */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 1 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
+        >
+          <span className="text-xs uppercase tracking-[0.2em] font-bold text-foreground/40">Scroll</span>
+          <div className="w-px h-12 bg-gradient-to-b from-primary to-transparent" />
+        </motion.div>
+      </section>
+
+      {/* ════════════════════════════════════
+          ABOUT SECTION
+      ════════════════════════════════════ */}
+      <section className="section-spacing relative bg-secondary/30">
+        <div className="container-max">
+          <div className="grid md:grid-cols-2 gap-20 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+              className="relative"
+            >
+              <div className="aspect-square rounded-3xl overflow-hidden glass-card p-4">
+                <div className="w-full h-full rounded-2xl bg-gradient-to-br from-primary/20 to-blue-400/20 relative group">
+                  <img 
+                    src="/profile.png" 
+                    alt="Profile" 
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  />
+                  <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
               </div>
+              {/* Decorative elements */}
+              <div className="absolute -bottom-6 -right-6 w-32 h-32 bg-primary/20 blur-3xl rounded-full" />
+            </motion.div>
 
-              <div className="flex-1 flex justify-center items-center">
-                <RobotFollower />
-              </div>
-            </div>
-          </div>
-        </AnimatedSection>
-
-
-        {/* ════════════════════════════════════
-            SKILLS (Circular Slide-In)
-        ════════════════════════════════════ */}
-        <AnimatedSection direction="up" className="relative w-full">
-          <div className={`relative w-full ${sh} overflow-hidden rounded-[3rem] shadow-2xl flex items-center`}>
-            {/* Background Orbital Rings (Decorative) */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-              <div className="w-[800px] h-[800px] border-2 border-dashed border-white/20 rounded-full animate-[spinSlow_40s_linear_infinite]" />
-              <div className="absolute w-[600px] h-[600px] border border-dotted border-white/10 rounded-full animate-[spinCCW_30s_linear_infinite]" />
-            </div>
-
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
-
-            <div className="relative z-10 max-w-7xl mx-auto w-full px-8 py-20">
-              <SectionTitle title="My Expertise" subtitle="A circular fusion of logic and creativity" className="text-white drop-shadow-lg" />
-
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mt-16">
-                {skills.map((skill, i) => (
-                  <div key={skill.title}
-                    className="group relative transition-all duration-700 ease-out"
-                    style={{
-                      // Handing "Circular Slide" via initial offset and stagger
-                      animation: `scaleIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards`,
-                      animationDelay: `${i * 0.15}s`,
-                      opacity: 0
-                    }}
-                  >
-                    <SkillCard icon={skill.icon} title={skill.title} isLearning={skill.isLearning}
-                      className="backdrop-blur-md bg-white/5 hover:bg-indigo-500/20 border border-white/10 text-white shadow-xl" />
-
-                    <div className="mt-4 h-1 w-full bg-white/5 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-indigo-500 to-pink-500 transition-all duration-[1.5s]"
-                        style={{ width: `${skill.pct * 100}%`, transitionDelay: `${0.5 + i * 0.1}s` }} />
+            <div>
+              <SectionHeading 
+                title="A passion for perfection." 
+                subtitle="I create digital products that feel as good as they look. My approach is centered around performance, accessibility, and pixel-perfect execution."
+              />
+              <motion.div 
+                variants={staggerContainer}
+                initial="initial"
+                whileInView="animate"
+                viewport={{ once: true }}
+                className="space-y-6"
+              >
+                {[
+                  { title: 'User Experience', text: 'Crafting intuitive journeys that solve real problems.' },
+                  { title: 'Modern Stack', text: 'Using the latest technologies to ensure future-proof solutions.' },
+                  { title: 'Performance', text: 'Optimized to the bone for lightning-fast load times.' }
+                ].map((item, i) => (
+                  <motion.div key={i} variants={fadeIn} className="flex gap-4">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <Sparkles size={16} className="text-primary" />
                     </div>
-                  </div>
+                    <div>
+                      <h4 className="font-bold text-lg mb-1">{item.title}</h4>
+                      <p className="text-foreground/60">{item.text}</p>
+                    </div>
+                  </motion.div>
                 ))}
-              </div>
+              </motion.div>
             </div>
           </div>
-        </AnimatedSection>
+        </div>
+      </section>
 
+      {/* ════════════════════════════════════
+          SKILLS SECTION
+      ════════════════════════════════════ */}
+      <section className="section-spacing container-max">
+        <SectionHeading 
+          title="Technical Expertise" 
+          subtitle="My toolkit for bringing complex ideas to life across the digital landscape."
+        />
+        <motion.div 
+          variants={staggerContainer}
+          initial="initial"
+          whileInView="animate"
+          viewport={{ once: true }}
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6"
+        >
+          {skills.map((skill, i) => (
+            <motion.div 
+              key={i} 
+              variants={fadeIn}
+              className="glass-card p-8 text-center flex flex-col items-center group card-lift"
+            >
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4 transition-transform duration-500 group-hover:scale-110">
+                {skill.icon}
+              </div>
+              <h3 className="font-bold text-sm uppercase tracking-widest text-foreground/80 mb-2">{skill.title}</h3>
+              <div className="w-full h-1 bg-foreground/5 rounded-full overflow-hidden mt-auto">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  whileInView={{ width: `${skill.pct}%` }}
+                  transition={{ duration: 1, delay: 0.5 }}
+                  className="h-full bg-primary"
+                />
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </section>
 
-        {/* --- AI AGENCY (Uniform Size) --- */}
-        <AnimatedSection direction="up" className="relative w-full">
-          <div className={`relative w-full ${sh} overflow-hidden rounded-[3rem] shadow-2xl flex items-center mb-12`}>
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" />
-            <div className="relative z-10 max-w-7xl mx-auto w-full px-8 py-24 flex items-center justify-center">
-              <div className="backdrop-blur-2xl bg-white/10 hover:bg-white/15 border border-white/20 rounded-[3.5rem] p-12 md:p-24 text-center max-w-4xl w-full shadow-2xl relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 via-transparent to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-                <div className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-indigo-500/20 text-white font-semibold mb-8 border border-indigo-400/30">
-                  <Sparkles size={18} className="animate-spin-slow" />
-                  Coming Soon
+      {/* ════════════════════════════════════
+          FEATURED PROJECTS
+      ════════════════════════════════════ */}
+      <section className="section-spacing bg-secondary/30">
+        <div className="container-max">
+          <SectionHeading 
+            title="Featured Projects" 
+            subtitle="A curated selection of work that represents my technical depth and creative vision."
+          />
+          <div className="grid md:grid-cols-3 gap-8">
+            {projects.map((project, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: i * 0.1 }}
+                className="glass-card overflow-hidden group flex flex-col"
+              >
+                <div className="aspect-[16/10] bg-primary/5 overflow-hidden relative">
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-blue-400/20" />
+                  <motion.div 
+                    whileHover={{ scale: 1.05 }}
+                    className="absolute inset-0 flex items-center justify-center"
+                  >
+                    <Code size={48} className="text-primary/40" />
+                  </motion.div>
                 </div>
-                <h2 className="text-4xl md:text-7xl font-black text-white mb-6 leading-tight">
-                  Building My <span className="text-gradient">AI Agency</span>
-                </h2>
-                <p className="text-xl text-gray-200/90 max-w-2xl mx-auto mb-12 leading-relaxed">
-                  I am creating a suite of next-generation AI-powered tools and interfaces to revolutionize how businesses interact with the digital world.
+                <div className="p-8 flex flex-col flex-grow">
+                  <h3 className="text-2xl font-bold mb-3">{project.title}</h3>
+                  <p className="text-foreground/60 mb-6 flex-grow">{project.desc}</p>
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {project.tech.map((t, j) => (
+                      <span key={j} className="text-xs font-bold uppercase tracking-widest px-3 py-1 bg-primary/5 text-primary rounded-full border border-primary/10">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                  <Button variant="outline" className="w-full rounded-xl border-white/10 hover:bg-primary hover:text-white hover:border-primary transition-all">
+                    View Case Study <ArrowRight size={16} className="ml-2" />
+                  </Button>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════
+          EXPERIENCE TIMELINE
+      ════════════════════════════════════ */}
+      <section className="section-spacing container-max">
+        <SectionHeading 
+          title="Career Journey" 
+          subtitle="My professional evolution through technology and design."
+        />
+        <div className="max-w-4xl mx-auto">
+          {experience.map((item, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: i * 0.1 }}
+              className="relative pl-12 pb-12 border-l border-white/10 last:pb-0"
+            >
+              <div className="absolute left-0 top-0 -translate-x-1/2 w-4 h-4 rounded-full bg-primary shadow-[0_0_15px_rgba(59,130,246,0.6)]" />
+              <div className="text-sm font-bold uppercase tracking-[0.2em] text-primary mb-2">{item.year}</div>
+              <h3 className="text-2xl font-bold mb-1">{item.title}</h3>
+              <div className="text-lg font-medium text-foreground/80 mb-4">{item.company}</div>
+              <p className="text-foreground/60 leading-relaxed max-w-2xl">{item.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* ════════════════════════════════════
+          CONTACT SECTION
+      ════════════════════════════════════ */}
+      <section className="section-spacing relative overflow-hidden">
+        <div className="absolute inset-0 bg-primary/5 blur-[150px] rounded-full" />
+        <div className="container-max relative z-10">
+          <div className="glass-card p-8 md:p-20">
+            <div className="grid md:grid-cols-2 gap-16">
+              <div>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary mb-8"
+                >
+                  <Mail size={32} />
+                </motion.div>
+                <h2 className="text-4xl md:text-6xl font-black mb-6">Let's build something <span className="text-primary italic">extraordinary</span>.</h2>
+                <p className="text-lg text-foreground/60 mb-12">
+                  Have a project in mind? Let's discuss how we can work together to bring your vision to life.
                 </p>
-                <div className="flex justify-center gap-4 mb-12">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className={`w-3 h-3 rounded-full ${i === 2 ? 'bg-indigo-400 shadow-[0_0_12px_rgba(129,140,248,0.8)]' : 'bg-white/30'} animate-bounce`} style={{ animationDelay: `${i * 0.1}s` }} />
-                  ))}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4 text-foreground/80">
+                    <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
+                      <Mail size={18} />
+                    </div>
+                    <span className="font-bold">hello@omkartambe.com</span>
+                  </div>
+                  <div className="flex items-center gap-4 text-foreground/80">
+                    <div className="w-10 h-10 rounded-full bg-secondary flex items-center justify-center">
+                      <Briefcase size={18} />
+                    </div>
+                    <span className="font-bold">Available for Freelance</span>
+                  </div>
                 </div>
-                <Button variant="glass" size="lg" disabled className="px-10 py-7 text-lg bg-white/5 border border-white/10 text-white/50 cursor-not-allowed">
-                  Under Development
-                </Button>
               </div>
+
+              <motion.form 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="space-y-6"
+              >
+                <div className="grid grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-foreground/40 px-1">Name</label>
+                    <input 
+                      type="text" 
+                      placeholder="John Doe"
+                      className="w-full px-6 py-4 rounded-2xl bg-secondary/50 border border-white/5 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all duration-300"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-foreground/40 px-1">Email</label>
+                    <input 
+                      type="email" 
+                      placeholder="john@example.com"
+                      className="w-full px-6 py-4 rounded-2xl bg-secondary/50 border border-white/5 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all duration-300"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-foreground/40 px-1">Message</label>
+                  <textarea 
+                    rows={4}
+                    placeholder="Tell me about your project..."
+                    className="w-full px-6 py-4 rounded-2xl bg-secondary/50 border border-white/5 focus:border-primary/50 focus:ring-4 focus:ring-primary/10 outline-none transition-all duration-300 resize-none"
+                  />
+                </div>
+                <Button className="btn-premium w-full py-8 text-lg">
+                  Send Message
+                </Button>
+              </motion.form>
+            </div>
+            
+            <div className="flex gap-8 mt-16 pt-16 border-t border-white/10 w-full justify-center">
+              {[
+                { icon: <Github />, link: '#' },
+                { icon: <Linkedin />, link: '#' },
+                { icon: <Twitter />, link: '#' }
+              ].map((social, i) => (
+                <motion.a
+                  key={i}
+                  href={social.link}
+                  whileHover={{ y: -5, scale: 1.1 }}
+                  className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary/10 hover:text-primary transition-colors duration-300"
+                >
+                  {social.icon}
+                </motion.a>
+              ))}
             </div>
           </div>
-        </AnimatedSection>
+        </div>
+      </section>
 
-
-      </div>
-    </PageTransition>
+      {/* ════════════════════════════════════
+          FOOTER
+      ════════════════════════════════════ */}
+      <footer className="py-12 border-t border-white/5">
+        <div className="container-max flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="text-sm font-medium text-foreground/40">
+            © {new Date().getFullYear()} Omkar Tambe. All rights reserved.
+          </div>
+          <div className="flex gap-8">
+            <a href="#" className="text-xs uppercase tracking-widest font-bold text-foreground/60 hover:text-primary transition-colors">Privacy</a>
+            <a href="#" className="text-xs uppercase tracking-widest font-bold text-foreground/60 hover:text-primary transition-colors">Terms</a>
+            <a href="#" className="text-xs uppercase tracking-widest font-bold text-foreground/60 hover:text-primary transition-colors">Cookies</a>
+          </div>
+        </div>
+      </footer>
+    </div>
   );
 };
 

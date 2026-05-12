@@ -4,23 +4,19 @@ interface SectionTitleProps {
   className?: string;
 }
 
-import WaterEffect from './WaterEffect';
-
 const SectionTitle = ({ title, subtitle, className }: SectionTitleProps) => {
   return (
-    <div className={`text-center mb-12 ${className || ''}`}>
-      <WaterEffect>
-        <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 drop-shadow-xl">
-          {title}
-        </h2>
-      </WaterEffect>
+    <div className={`mb-12 ${className || ''}`}>
+      <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">
+        {title}
+      </h2>
 
       {subtitle && (
-        <p className="text-gray-100 max-w-2xl mx-auto drop-shadow-md">
+        <p className="text-lg text-foreground/60 max-w-2xl">
           {subtitle}
         </p>
       )}
-      <div className="mt-4 mx-auto w-24 h-1 bg-gradient-to-r from-white/60 to-white/80 rounded-full shadow-lg" />
+      <div className="mt-6 w-20 h-1 bg-primary rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
     </div>
   );
 };

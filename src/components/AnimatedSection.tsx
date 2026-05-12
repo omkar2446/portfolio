@@ -1,12 +1,11 @@
-import { ReactNode, useEffect, useRef } from 'react';
-import { useScrollAnimation } from '@/hooks/useScrollAnimation';
-import gsap from 'gsap';
+import { ReactNode } from 'react';
+import { motion } from 'framer-motion';
 
 interface AnimatedSectionProps {
   children: ReactNode;
   className?: string;
   delay?: number;
-  direction?: 'up' | 'left' | 'right' | 'none';
+  direction?: 'up' | 'down' | 'left' | 'right' | 'none';
 }
 
 const AnimatedSection = ({ 
@@ -15,57 +14,34 @@ const AnimatedSection = ({
   delay = 0,
   direction = 'up' 
 }: AnimatedSectionProps) => {
-  const { ref, isVisible } = useScrollAnimation(0.1);
-  const contentRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (isVisible && contentRef.current) {
-      gsap.to(contentRef.current, {
-        opacity: 1,
-        x: 0,
-        y: 0,
-        z: 0,
-        rotateX: 0,
-        scale: 1,
-        duration: 1.4,
-        ease: 'power4.out',
+  const variants = {
+    hidden: {
+      opacity: 0,
+      y: direction === 'up' ? 30 : direction === 'down' ? -30 : 0,
+      x: direction === 'left' ? 30 : direction === 'right' ? -30 : 0,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      x: 0,
+      transition: {
+        duration: 0.8,
         delay: delay / 1000,
-        force3D: true
-      });
-    }
-  }, [isVisible, delay]);
-
-  const getInitialTransform = () => {
-    switch (direction) {
-      case 'left': return 'translateX(-100px) opacity(0)';
-      case 'right': return 'translateX(100px) opacity(0)';
-      case 'up': return 'translateY(80px) opacity(0)';
-      default: return 'opacity(0)';
+        ease: [0.22, 1, 0.36, 1]
+      }
     }
   };
 
   return (
-    <div
-      ref={ref}
-      className={`relative w-full ${className}`}
+    <motion.div
+      variants={variants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-100px" }}
+      className={className}
     >
-      <div
-        ref={contentRef}
-        style={{
-          opacity: 0,
-          transform: direction === 'up' 
-            ? 'translateY(80px) translateZ(-50px) rotateX(10deg)' 
-            : direction === 'left' 
-              ? 'translateX(-100px)' 
-              : direction === 'right' 
-                ? 'translateX(100px)' 
-                : 'none',
-          willChange: 'transform, opacity',
-        }}
-      >
-        {children}
-      </div>
-    </div>
+      {children}
+    </motion.div>
   );
 };
 
