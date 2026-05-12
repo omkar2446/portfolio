@@ -4,131 +4,102 @@ import PageTransition from '@/components/PageTransition';
 import AnimatedSection from '@/components/AnimatedSection';
 import SectionTitle from '@/components/SectionTitle';
 import { ArrowRight, Calendar, Hash } from 'lucide-react';
-import { useEffect, useRef } from 'react';
-import gsap from 'gsap';
-
 
 const blogPosts = [
   {
-    title: 'How I Started Web Development',
-    description: 'My journey from complete beginner to building real-world projects. Tips and resources that helped me along the way.',
+    title: 'The Architecture of Modern Interfaces',
+    description: 'Exploring the intersection of technical performance and aesthetic minimalist design.',
     date: 'Dec 15, 2024',
-    category: 'Journey',
+    category: 'Design',
     slug: 'how-i-started-web-development',
   },
   {
-    title: 'My Journey into AI',
-    description: 'Exploring the fascinating world of artificial intelligence and how it inspired me to build AI-powered tools.',
+    title: 'Building Scalable AI Tools',
+    description: 'Insights into developing low-latency, high-impact AI integrations for the web.',
     date: 'Dec 10, 2024',
-    category: 'AI',
+    category: 'Technology',
     slug: 'my-journey-into-ai',
   },
   {
-    title: 'Learning Machine Learning Step by Step',
-    description: 'A beginner-friendly guide to understanding machine learning concepts and getting started with your first ML project.',
+    title: 'Minimalist Engineering Philosophy',
+    description: 'Why less is often more when it comes to long-term software maintainability.',
     date: 'Dec 5, 2024',
-    category: 'Tutorial',
+    category: 'Engineering',
     slug: 'learning-machine-learning-step-by-step',
   },
 ];
 
 const Blog = () => {
-  const trendingRef = useRef<HTMLUListElement>(null);
-
-  useEffect(() => {
-    if (!trendingRef.current) return;
-    const items = trendingRef.current.querySelectorAll('li');
-    gsap.set(items, { opacity: 0, scale: 0.8 });
-
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        gsap.to(items, {
-          opacity: 1,
-          scale: 1,
-          duration: 0.5,
-          stagger: 0.1,
-          ease: 'back.out(1.7)',
-        });
-        observer.disconnect();
-      }
-    }, { threshold: 0.2 });
-
-    observer.observe(trendingRef.current);
-    return () => observer.disconnect();
-  }, []);
-
-  const topics = ['Web Development', 'React', 'Artificial Intelligence', 'Machine Learning', 'Next.js', 'UI Design'];
+  const topics = ['Web Architecture', 'React Ecosystem', 'Artificial Intelligence', 'Machine Learning', 'Next.js 15', 'Premium UX'];
 
   return (
     <PageTransition>
-      <div className="min-h-screen pt-24">
-        <section className="container mx-auto px-6 py-20">
+      <div className="min-h-screen pt-32 pb-20 overflow-hidden">
+        <div className="container-max">
           <SectionTitle 
-            title="Blog" 
-            subtitle="Thoughts, tutorials, and my learning journey"
-            className="text-white drop-shadow-lg"
+            label="ARCHIVES"
+            title="INSIGHTS & LOGS." 
+            subtitle="Documenting technical challenges and the evolution of digital craft through strategic development."
+            className="mb-24"
           />
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-20">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-12 mb-24">
             {blogPosts.map((post, index) => (
               <AnimatedSection key={post.title} delay={index * 100}>
-                <article className="backdrop-blur-xl bg-white/10 hover:bg-white/15 border border-white/20 rounded-2xl h-full flex flex-col hover-lift group overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500">
-                  <div className="h-48 bg-gradient-to-br from-white/20 to-white/10 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-                    <span className="absolute bottom-4 left-4 px-3 py-1 rounded-full backdrop-blur-sm bg-white/20 text-white text-sm font-medium border border-white/20 shadow-lg">
-                      {post.category}
-                    </span>
-                  </div>
+                <article className="glass-card h-full flex flex-col card-lift group relative overflow-hidden">
+                  <div className="h-4 bg-primary/20 absolute top-0 left-0 right-0 shimmer" />
                   
-                  <div className="p-6 flex flex-col flex-grow">
-                    <div className="flex items-center gap-2 text-gray-200 text-sm mb-3 drop-shadow-sm">
-                      <Calendar size={14} className="text-white" />
+                  <div className="p-10 flex flex-col flex-grow">
+                    <div className="flex items-center gap-3 text-foreground/40 text-[10px] font-black uppercase tracking-[0.2em] mb-6">
+                      <Calendar size={14} className="text-primary" />
                       {post.date}
                     </div>
                     
-                    <h3 className="text-xl font-bold text-white mb-3 group-hover:text-white transition-colors drop-shadow-lg">
+                    <h3 className="text-3xl font-black mb-6 tracking-tighter leading-tight">
                       {post.title}
                     </h3>
-                    <p className="text-gray-100 mb-6 flex-grow drop-shadow-md">
+                    <p className="text-lg text-foreground/50 mb-10 flex-grow leading-relaxed">
                       {post.description}
                     </p>
                     
-                    <Link to={`/blog/${post.slug}`}>
-                      <Button 
-                        variant="ghost" 
-                        className="w-fit group/btn relative overflow-hidden backdrop-blur-sm bg-white/10 hover:bg-white/20 border border-white/20 text-white hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl"
-                      >
-                        <span className="relative z-10 flex items-center gap-2">
-                          Read More
-                          <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
-                        </span>
-                      </Button>
-                    </Link>
+                    <div className="flex items-center justify-between mt-auto">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-primary">
+                        {post.category}
+                      </span>
+                      <Link to={`/blog/${post.slug}`}>
+                        <Button 
+                          variant="ghost" 
+                          className="group/btn relative px-0 hover:bg-transparent"
+                        >
+                          <span className="relative z-10 flex items-center gap-2 font-black uppercase tracking-[0.2em] text-[10px] group-hover/btn:text-primary transition-colors">
+                            Read Entry
+                            <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform" />
+                          </span>
+                        </Button>
+                      </Link>
+                    </div>
                   </div>
                 </article>
               </AnimatedSection>
             ))}
           </div>
 
-          <div className="mt-20">
-            <h4 className="text-white font-bold mb-6 flex items-center gap-2">
-              <Hash className="text-purple-400" size={20} />
-              Trending Topics
+          <div className="mt-32">
+            <h4 className="text-xl font-black mb-10 tracking-[0.2em] flex items-center gap-4 text-foreground/30">
+              <Hash className="text-primary" size={20} />
+              EXPLORE TOPICS
             </h4>
-            <ul ref={trendingRef} className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-4">
               {topics.map((topic, i) => (
-                <li key={i} className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white text-sm hover:bg-white/10 transition-colors cursor-pointer shadow-lg backdrop-blur-sm">
-                  {topic}
-                </li>
+                <AnimatedSection key={i} delay={i * 50} direction="up">
+                  <div className="px-8 py-4 rounded-2xl bg-secondary/30 border border-white/5 text-foreground/60 text-xs font-black uppercase tracking-widest hover:bg-primary/10 hover:text-primary transition-all cursor-pointer shadow-soft">
+                    {topic}
+                  </div>
+                </AnimatedSection>
               ))}
-            </ul>
+            </div>
           </div>
-
-
-
-          {/* Newsletter Section */}
-          
-        </section>
+        </div>
       </div>
     </PageTransition>
   );

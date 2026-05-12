@@ -2,7 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import PageTransition from '@/components/PageTransition';
 import AnimatedSection from '@/components/AnimatedSection';
-import { ArrowLeft, Calendar, Clock, User } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock, User, Hash } from 'lucide-react';
 
 const blogPostsData: Record<string, {
   title: string;
@@ -13,77 +13,46 @@ const blogPostsData: Record<string, {
   content: string[];
 }> = {
   'how-i-started-web-development': {
-    title: 'How I Started Web Development',
-    description: 'My journey from complete beginner to building real-world projects. Tips and resources that helped me along the way.',
+    title: 'The Architecture of Modern Interfaces',
+    description: 'Exploring the intersection of technical performance and aesthetic minimalist design.',
     date: 'Dec 15, 2024',
-    category: 'Journey',
+    category: 'Design',
     readTime: '5 min read',
     content : [
-  "My journey into web development started with curiosity and one simple question: How do websites actually work? I still remember opening the page source for the first time and staring at all that HTML like it was some secret hacker language 😄. That curiosity slowly turned into passion.",
-
-  "The first real step I took was learning HTML. Writing my first few tags and seeing content appear on the browser felt magical. I was like, ‘Wait… I made this?!’ 😄 I used free resources like freeCodeCamp and MDN Web Docs to build a strong foundation.",
-
-  "After that, I moved on to CSS, and that’s where things got fun. Learning Flexbox, Grid, and responsive design helped me understand how websites actually look good on all devices. Later, Tailwind CSS became my favorite because it made styling faster and cleaner.",
-
-  "JavaScript was the real game changer. At first, it felt confusing, but once I understood variables, functions, and DOM manipulation, everything started making sense. I built small projects like calculators and to-do apps, broke them, fixed them, and learned a lot in the process 😅.",
-
-  "Then came React — and that completely changed how I build applications. Components, state management, and reusable UI made development feel powerful. Using React, I started building real-world projects that helped me understand how actual products are built.",
-
-  "If I had to give one piece of advice, it would be this: start small, build projects, and don’t be afraid to make mistakes. Every error is a lesson. Keep learning, stay consistent, and most importantly — keep coding every day 💻🔥",
-
-  "— Omkar Tambe"
-]
+      "The pursuit of digital excellence begins with a single question: how do we balance complexity with clarity? In the modern web landscape, users expect seamless interactions paired with high-fidelity visuals. Achieving this requires a deep understanding of both frontend architecture and user psychology.",
+      "At the core of every premium interface is a robust design system. Consistency in spacing, typography, and motion creates a sense of reliability and luxury. By utilizing modern tools like React and Tailwind CSS, we can build systems that are both highly performant and incredibly flexible.",
+      "Performance is not just a technical metric; it is a fundamental part of the user experience. A slow interface, no matter how beautiful, will always feel 'cheap'. Optimization techniques like lazy loading, image compression, and efficient state management are essential for maintaining a premium feel.",
+      "Minimalism is not about removing features; it is about clarifying intent. Every element on the screen should serve a purpose. If a design choice doesn't contribute to the user's primary objective, it is likely noise and should be reconsidered.",
+      "As we look toward the future, the role of the frontend engineer is evolving. We are no longer just building pages; we are crafting immersive digital environments. Staying at the forefront of this evolution requires constant learning and a relentless focus on quality."
+    ]
   },
   'my-journey-into-ai': {
-    title: 'My Journey into AI',
-    description: 'Exploring the fascinating world of artificial intelligence and how it inspired me to build AI-powered tools.',
+    title: 'Building Scalable AI Tools',
+    description: 'Insights into developing low-latency, high-impact AI integrations for the web.',
     date: 'Dec 10, 2024',
-    category: 'AI',
+    category: 'Technology',
     readTime: '4 min read',
     content :[
-  "My journey into Artificial Intelligence started with curiosity and a little bit of fear 😄. AI sounded very advanced at first — words like neural networks, models, and algorithms made me think, ‘Arre baba, ye toh bohot tough hai!’ But curiosity won, and I decided to explore it step by step.",
-
-  "The first thing I learned was how AI actually works behind the scenes. I started with Python and basic concepts like data, logic, and problem-solving. Slowly, things began to make sense, and AI didn’t feel that scary anymore.",
-
-  "Then I moved into Machine Learning, where I learned how machines learn from data. Concepts like supervised and unsupervised learning were confusing at first, but once I practiced with small datasets, everything became clearer. As we say — ‘Samajla ki mag sagla soppa vatata.’ 😄",
-
-  "Next came the exciting part — building models. I trained simple models for prediction and classification, made mistakes, fixed them, and learned a lot in the process. Some models worked, some failed, but every failure taught me something new.",
-
-  "When I explored AI tools and real-world applications, my interest grew even more. Chatbots, recommendation systems, automation — all of this showed me how powerful AI really is. That’s when I decided to use AI in real projects and experiments.",
-
-  "Today, I’m still learning AI step by step. I believe AI is not about being perfect, it’s about continuous learning. My goal is to combine AI with real-world applications and build something meaningful in the future.",
-
-  "My advice for beginners: Don’t rush. Learn slowly, practice daily, and don’t fear mistakes. AI is a journey, not a race. As we say — ‘Halu-halu pan pakka!’ 🚀",
-
-  "— Omkar Tambe"
-]
-
-
+      "Integrating artificial intelligence into web applications is more than just making API calls. It's about creating a cohesive experience where the AI feels like a natural extension of the interface. This requires careful consideration of latency, feedback loops, and user trust.",
+      "The biggest challenge in web-based AI is often the perceived delay. When a user interacts with an AI-powered feature, they expect an immediate response. Techniques like streaming text responses (as seen in modern LLMs) and optimistic UI updates are crucial for keeping the experience fluid.",
+      "Scalability is another key factor. As your user base grows, your AI integrations must be able to handle the load without sacrificing performance. This often involves backend optimizations, clever caching strategies, and sometimes even moving some computation to the edge or the client side.",
+      "Trust is the invisible metric that defines the success of an AI tool. Users need to feel in control and understand what the AI is doing. Transparent loading states, clear error handling, and intuitive feedback mechanisms are essential for building this trust.",
+      "The potential for AI to revolutionize the web is immense. From personalized content recommendations to intelligent automation, the possibilities are endless. The key is to implement these technologies in a way that truly adds value to the user's life."
+    ]
   },
   'learning-machine-learning-step-by-step': {
-    title: 'Learning Machine Learning Step by Step',
-    description: 'A beginner-friendly guide to understanding machine learning concepts and getting started with your first ML project.',
+    title: 'Minimalist Engineering Philosophy',
+    description: 'Why less is often more when it comes to long-term software maintainability.',
     date: 'Dec 5, 2024',
-    category: 'Tutorial',
+    category: 'Engineering',
     readTime: '6 min read',
     content :[
-  "Machine Learning can feel overwhelming at first. So many algorithms, so much math, and so many tutorials that make you think: 'Bhai, ye sab kaise hoga?' 😅 I’ve been there too. This post is my attempt to explain ML in a simple and practical way — the way I learned it.",
-
-  "Step 1: Start with Python. You don’t need to be a pro, but you should be comfortable with variables, loops, functions, and basic data structures. Libraries like NumPy and Pandas will soon become your best friends. Trust me, once you get used to them, coding feels smooth like butter 🧈.",
-
-  "Step 2: Learn the basics of math. Yes, math 😄 — but don’t panic! You don’t need to be a topper. Just understand the basics of linear algebra, probability, and a little calculus. It’s more about understanding concepts than solving big equations. Thoda patience rakha ki ho jaata hai 👍.",
-
-  "Step 3: Start with supervised learning. This is where things get interesting. Try classification and regression models. Build something simple like house price prediction or spam detection. Scikit-learn is perfect for beginners and very easy to use.",
-
-  "Step 4: Practice with real datasets. Kaggle is a goldmine for learning. Start with small datasets like Iris or Titanic. Don’t worry if your model performs badly at first — even my first models were terrible 😄. Practice makes perfect.",
-
-  "Step 5: Build projects. This is the most important step. Theory is good, but projects make you confident. Try making a movie recommendation system or a sentiment analyzer. Share your work, learn from feedback, and keep improving.",
-
-  "Remember — Machine Learning is a marathon, not a sprint. Take it step by step. Celebrate small wins, stay curious, and never stop experimenting. As we say in Marathi: 'Halu-halu pan nischit!' 🚀",
-
-  "— Omkar Tambe"
-]
-
+      "In the world of software engineering, complexity is the enemy of progress. As codebases grow, the cost of maintenance and the risk of bugs increase exponentially. Adopting a minimalist philosophy can help mitigate these risks and lead to more sustainable development.",
+      "Minimalist engineering starts with the selection of tools. Choosing technologies that are simple, well-documented, and have a clear purpose is essential. It's often better to master a small set of powerful tools than to constantly jump between the latest trends.",
+      "The structure of your code is equally important. Simple, modular architectures are easier to understand, test, and refactor. Avoiding 'clever' solutions in favor of readable, predictable code will save countless hours of debugging in the long run.",
+      "Documentation is often overlooked, but it is a cornerstone of minimalist engineering. Clear, concise documentation allows other developers (and your future self) to understand the intent behind the code without having to reverse-engineer it.",
+      "Finally, minimalism requires the courage to say no. No to unnecessary features, no to over-engineering, and no to technical debt. By focusing on what truly matters, we can build software that is robust, elegant, and built to last."
+    ]
   }
 };
 
@@ -94,14 +63,14 @@ const BlogPost = () => {
   if (!post) {
     return (
       <PageTransition>
-        <div className="min-h-screen pt-24 container mx-auto px-6 py-20">
-          <div className="glass-card p-12 text-center">
-            <h1 className="text-2xl font-bold text-foreground mb-4">Post Not Found</h1>
-            <p className="text-muted-foreground mb-6">The blog post you're looking for doesn't exist.</p>
+        <div className="min-h-screen pt-32 pb-20 container-max">
+          <div className="glass-card p-20 text-center">
+            <h1 className="text-4xl font-black mb-8 tracking-tighter">Log Entry Not Found.</h1>
+            <p className="text-xl text-foreground/50 mb-12">The requested technical documentation is missing or has been moved.</p>
             <Link to="/blog">
-              <Button variant="hero">
-                <ArrowLeft size={18} />
-                Back to Blog
+              <Button className="btn-premium px-10 py-7 text-xs font-black uppercase tracking-[0.3em]">
+                <ArrowLeft size={16} className="mr-3" />
+                Return to Logs
               </Button>
             </Link>
           </div>
@@ -112,50 +81,52 @@ const BlogPost = () => {
 
   return (
     <PageTransition>
-      <div className="min-h-screen pt-24">
-        <article className="container mx-auto px-6 py-12 max-w-4xl">
-          <AnimatedSection>
+      <div className="min-h-screen pt-32 pb-20 overflow-hidden">
+        <article className="container-max max-w-5xl">
+          <AnimatedSection direction="up">
             <Link to="/blog">
-              <Button variant="ghost" className="mb-8 hover:bg-primary/10">
-                <ArrowLeft size={18} />
-                Back to Blog
+              <Button variant="ghost" className="mb-12 px-0 hover:bg-transparent group">
+                <span className="flex items-center gap-3 text-xs font-black uppercase tracking-[0.3em] text-foreground/30 group-hover:text-primary transition-colors">
+                  <ArrowLeft size={16} />
+                  Back to Archives
+                </span>
               </Button>
             </Link>
 
             {/* Header */}
-            <header className="mb-12">
-              <span className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary font-medium text-sm mb-6">
-                {post.category}
-              </span>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-6">
+            <header className="mb-20">
+              <div className="flex items-center gap-4 mb-8">
+                <span className="px-4 py-2 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest border border-primary/20 shadow-glow">
+                  {post.category}
+                </span>
+              </div>
+              <h1 className="text-5xl md:text-7xl font-black mb-10 tracking-tighter leading-tight">
                 {post.title}
               </h1>
-              <p className="text-xl text-muted-foreground mb-6">
-                {post.description}
-              </p>
-              <div className="flex flex-wrap items-center gap-6 text-muted-foreground text-sm">
-                <span className="flex items-center gap-2">
-                  <User size={16} />
+              <div className="flex flex-wrap items-center gap-10 text-foreground/30 text-[10px] font-black uppercase tracking-[0.3em]">
+                <span className="flex items-center gap-3">
+                  <User size={14} className="text-primary" />
                   Omkar Tambe
                 </span>
-                <span className="flex items-center gap-2">
-                  <Calendar size={16} />
+                <span className="flex items-center gap-3">
+                  <Calendar size={14} className="text-primary" />
                   {post.date}
                 </span>
-                <span className="flex items-center gap-2">
-                  <Clock size={16} />
+                <span className="flex items-center gap-3">
+                  <Clock size={14} className="text-primary" />
                   {post.readTime}
                 </span>
               </div>
             </header>
 
             {/* Content */}
-            <div className="glass-card p-8 md:p-12">
-              <div className="prose prose-lg max-w-none">
+            <div className="glass-card p-12 md:p-20 relative overflow-hidden">
+              <div className="absolute top-0 left-0 right-0 h-1 bg-primary/20 shimmer" />
+              <div className="space-y-10">
                 {post.content.map((paragraph, index) => (
                   <p 
                     key={index} 
-                    className="text-muted-foreground leading-relaxed mb-6 last:mb-0"
+                    className="text-xl md:text-2xl text-foreground/60 leading-relaxed font-medium"
                   >
                     {paragraph}
                   </p>
@@ -163,16 +134,14 @@ const BlogPost = () => {
               </div>
             </div>
 
-            {/* Share / Navigation */}
-            <div className="mt-12 pt-8 border-t border-border">
-              <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <p className="text-muted-foreground">Thanks for reading!</p>
-                <Link to="/blog">
-                  <Button variant="heroOutline">
-                    Read More Posts
-                  </Button>
-                </Link>
-              </div>
+            {/* Footer / CTA */}
+            <div className="mt-20 pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+              <p className="text-xs font-black uppercase tracking-[0.3em] text-foreground/20">End of Technical Log.</p>
+              <Link to="/blog">
+                <Button className="btn-premium px-12 py-8 text-xs font-black uppercase tracking-[0.3em] shadow-premium shimmer">
+                  Explore More Insights
+                </Button>
+              </Link>
             </div>
           </AnimatedSection>
         </article>

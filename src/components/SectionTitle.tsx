@@ -1,23 +1,37 @@
+import { motion } from 'framer-motion';
+
 interface SectionTitleProps {
   title: string;
   subtitle?: string;
+  label?: string;
   className?: string;
+  centered?: boolean;
 }
 
-const SectionTitle = ({ title, subtitle, className }: SectionTitleProps) => {
+const SectionTitle = ({ title, subtitle, label, className, centered = false }: SectionTitleProps) => {
   return (
-    <div className={`mb-12 ${className || ''}`}>
-      <h2 className="text-3xl md:text-5xl font-bold mb-4 tracking-tight">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+      className={`mb-24 ${centered ? 'text-center' : ''} ${className || ''}`}
+    >
+      {label && (
+        <div className={`text-[10px] font-black uppercase tracking-[0.5em] text-primary mb-6 ${centered ? 'mx-auto' : ''}`}>
+          // {label}
+        </div>
+      )}
+      <h2 className="text-5xl md:text-8xl font-black mb-8 tracking-tighter leading-[0.95] text-balance">
         {title}
       </h2>
 
       {subtitle && (
-        <p className="text-lg text-foreground/60 max-w-2xl">
+        <p className={`text-xl md:text-2xl text-foreground/40 max-w-4xl leading-relaxed font-medium ${centered ? 'mx-auto' : ''}`}>
           {subtitle}
         </p>
       )}
-      <div className="mt-6 w-20 h-1 bg-primary rounded-full shadow-[0_0_15px_rgba(59,130,246,0.5)]" />
-    </div>
+    </motion.div>
   );
 };
 

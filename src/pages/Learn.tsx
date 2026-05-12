@@ -3,36 +3,45 @@ import { Button } from '@/components/ui/button';
 import PageTransition from '@/components/PageTransition';
 import AnimatedSection from '@/components/AnimatedSection';
 import SectionTitle from '@/components/SectionTitle';
-import { Code, Terminal, Atom, Brain, Play, BookOpen } from 'lucide-react';
+import { Code, Terminal, Atom, Brain, Play, BookOpen, Download, Database, FileJson, Layers } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const courses = [
   {
     icon: <Code size={32} />,
-    title: 'Web Development',
-    description: 'Learn HTML.',
+    title: 'Web Architecture',
+    description: 'Master the fundamental principles of modern web engineering. From structure to complex state patterns.',
     status: 'available',
     youtubeId: 'yrXeT0jfc7w',
   },
   {
     icon: <Terminal size={32} />,
-    title: 'Python Basics',
-    description: 'Master Python programming fundamentals. Perfect for beginners and automation enthusiasts.',
+    title: 'Python Mastery',
+    description: 'Advanced Python programming for engineering robust, automated, and high-performance systems.',
     status: 'available',
     youtubeId: 'YOUR_YOUTUBE_VIDEO_ID_2',
   },
   {
     icon: <Atom size={32} />,
-    title: 'React for Beginners',
-    description: 'Build interactive user interfaces with React. Learn component-based architecture.',
+    title: 'React Ecosystem',
+    description: 'Developing high-fidelity user interfaces with React and its comprehensive library ecosystem.',
     status: 'available',
     youtubeId: 'YOUR_YOUTUBE_VIDEO_ID_3',
   },
   {
     icon: <Brain size={32} />,
-    title: 'Machine Learning',
-    description: 'Introduction to ML concepts and algorithms. Currently learning and documenting my journey.',
+    title: 'Intelligent Systems',
+    description: 'Exploring neural networks and predictive modeling. Currently documenting technical milestones.',
     status: 'learning',
   },
+];
+
+const handbooks = [
+  { title: 'Python Handbook', icon: <Terminal size={40} className="text-[#3776AB]" />, color: 'from-[#3776AB]/20 to-[#FFD43B]/20' },
+  { title: 'C Handbook', icon: <Code size={40} className="text-[#A8B9CC]" />, color: 'from-[#A8B9CC]/20 to-[#555555]/20' },
+  { title: 'HTML Handbook', icon: <FileJson size={40} className="text-[#E34F26]" />, color: 'from-[#E34F26]/20 to-[#F06529]/20' },
+  { title: 'SQL Handbook', icon: <Database size={40} className="text-[#4479A1]" />, color: 'from-[#4479A1]/20 to-[#00758F]/20' },
+  { title: 'MongoDB Handbook', icon: <Layers size={40} className="text-[#47A248]" />, color: 'from-[#47A248]/20 to-[#589636]/20' },
 ];
 
 const Learn = () => {
@@ -40,93 +49,134 @@ const Learn = () => {
 
   return (
     <PageTransition>
-      <div className="min-h-screen pt-24">
-        <section className="container mx-auto px-6 py-20">
+      <div className="min-h-screen pt-32 pb-20 overflow-hidden">
+        <div className="container-max">
           <SectionTitle 
-            title="Learn From Me" 
-            subtitle="Sharing my knowledge and learning journey"
-            className="text-white drop-shadow-lg"
+            centered
+            label="Resources"
+            title="Knowledge Sharing" 
+            subtitle="Curated technical resources and strategic insights from my ongoing architectural journey."
           />
 
-          <div className="grid md:grid-cols-2 gap-10">
-            {courses.map((course, index) => (
-              <AnimatedSection key={course.title} delay={index * 100}>
-                <div className="backdrop-blur-xl bg-white/10 hover:bg-white/15 border border-white/20 rounded-2xl p-8 h-full hover-lift group relative overflow-hidden shadow-2xl hover:shadow-3xl transition-all duration-500">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400/5 to-purple-400/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  
-                  <div className="relative z-10">
-                    <div className="flex items-start justify-between mb-6">
-                      <div className="p-3 rounded-xl bg-blue-400/20 text-blue-300 group-hover:scale-110 transition-transform duration-300 border border-blue-400/30">
-                        {course.icon}
-                      </div>
-                      {course.status === 'learning' && (
-                        <span className="px-3 py-1 rounded-full bg-yellow-400/20 text-yellow-100 text-sm font-medium border border-yellow-400/30 drop-shadow-sm">
-                          Currently Learning
-                        </span>
-                      )}
+          {/* Handbooks Section */}
+          <div className="mb-40">
+            <div className="flex flex-col items-center mb-16 text-center">
+              <h2 className="text-4xl md:text-5xl font-black tracking-tighter">Download Handbooks</h2>
+            </div>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8">
+              {handbooks.map((handbook, i) => (
+                <AnimatedSection key={i} delay={i * 100}>
+                  <div className="glass-card p-10 flex flex-col items-center text-center group card-lift h-full relative overflow-hidden border-white/5 bg-white/5 hover:bg-white/10 transition-colors">
+                    <div className={`absolute inset-0 bg-gradient-to-br ${handbook.color} opacity-0 group-hover:opacity-100 transition-opacity duration-700`} />
+                    
+                    <div className="relative z-10 w-24 h-24 rounded-full bg-secondary/50 flex items-center justify-center mb-6 shadow-soft group-hover:scale-110 transition-all duration-500">
+                      {handbook.icon}
                     </div>
                     
-                    <h3 className="text-xl font-bold text-white mb-3 drop-shadow-lg">
-                      {course.title}
-                    </h3>
-                    <p className="text-gray-100 mb-6 drop-shadow-sm">
-                      {course.description}
-                    </p>
+                    <div className="relative z-10 flex-grow w-full">
+                      <h3 className="text-xl font-bold mb-1 tracking-tight text-foreground">{handbook.title}</h3>
+                      <p className="text-sm text-foreground/40 mb-8 font-medium">Download Handbook Here</p>
+                    </div>
                     
-                    <Button 
-                      variant={course.status === 'learning' ? 'outline' : 'default'}
-                      className="w-full bg-blue-500/20 hover:bg-blue-500/30 text-white border-blue-400/30 hover:border-blue-400/50 drop-shadow-sm"
-                      disabled={course.status === 'learning'}
-                      onClick={() => setActiveVideo(course.youtubeId)}
-                    >
-                      {course.status === 'learning' ? (
-                        <>
-                          <BookOpen size={18} />
-                          Coming Soon
-                        </>
-                      ) : (
-                        <>
-                          <Play size={18} />
-                          Watch / Learn
-                        </>
-                      )}
+                    <Button className="relative z-10 w-full py-6 rounded-xl bg-secondary/80 hover:bg-primary hover:text-white transition-all font-bold text-sm shadow-soft">
+                      Download
                     </Button>
                   </div>
-                </div>
-              </AnimatedSection>
-            ))}
+                </AnimatedSection>
+              ))}
+            </div>
           </div>
 
-          {/* Learning Philosophy */}
-          <AnimatedSection className="mt-16" delay={400}>
-            <div className="backdrop-blur-xl bg-white/10 hover:bg-white/15 border border-white/20 rounded-2xl p-8 md:p-12 text-center shadow-2xl hover:shadow-3xl transition-all duration-500">
-              <h3 className="text-2xl font-bold text-white mb-4 drop-shadow-lg">
-                My Learning Philosophy
+          {/* Courses Section */}
+          <div className="mb-40">
+            <div className="flex flex-col items-center mb-16 text-center">
+              <h2 className="text-4xl md:text-5xl font-black tracking-tighter">Premium Modules</h2>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-12">
+              {courses.map((course, index) => (
+                <AnimatedSection key={course.title} delay={index * 100}>
+                  <div className="glass-card p-12 h-full flex flex-col card-lift group relative overflow-hidden border-white/5">
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-primary/5 blur-[80px] rounded-full group-hover:bg-primary/10 transition-colors duration-700" />
+                    
+                    <div className="relative z-10 flex flex-col h-full">
+                      <div className="flex items-start justify-between mb-10">
+                        <div className="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center text-primary group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-soft">
+                          {course.icon}
+                        </div>
+                        {course.status === 'learning' && (
+                          <span className="px-4 py-2 rounded-full bg-primary/10 text-primary text-xs font-bold border border-primary/20 shadow-glow">
+                            Researching
+                          </span>
+                        )}
+                      </div>
+                      
+                      <h3 className="text-3xl font-black mb-4 tracking-tighter">
+                        {course.title}
+                      </h3>
+                      <p className="text-lg text-foreground/50 mb-10 leading-relaxed flex-grow font-medium">
+                        {course.description}
+                      </p>
+                      
+                      <Button 
+                        variant={course.status === 'learning' ? 'outline' : 'default'}
+                        className={`w-full py-8 text-sm font-bold rounded-2xl ${
+                          course.status === 'learning' 
+                          ? 'border-white/5 text-foreground/20' 
+                          : 'btn-premium shimmer shadow-premium'
+                        }`}
+                        disabled={course.status === 'learning'}
+                        onClick={() => setActiveVideo(course.youtubeId)}
+                      >
+                        {course.status === 'learning' ? (
+                          <>
+                            <BookOpen size={18} className="mr-2" />
+                            Waitlist
+                          </>
+                        ) : (
+                          <>
+                            <Play size={18} className="mr-2" />
+                            Initialize Course
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </div>
+                </AnimatedSection>
+              ))}
+            </div>
+          </div>
+
+          <AnimatedSection className="mt-24" delay={400}>
+            <div className="glass-card p-12 md:p-20 text-center relative overflow-hidden border-white/5">
+              <div className="absolute inset-0 bg-primary/5 blur-[150px] rounded-full -z-10" />
+              <h3 className="text-4xl md:text-5xl font-black mb-8 tracking-tighter">
+                The Philosophy of Continuous Growth.
               </h3>
-              <p className="text-gray-100 max-w-2xl mx-auto drop-shadow-sm">
-                I believe in learning by doing and sharing knowledge as I grow. 
-                These resources are designed to help beginners understand concepts 
-                through practical examples and real-world projects.
+              <p className="text-xl md:text-2xl text-foreground/40 max-w-4xl mx-auto leading-relaxed font-medium">
+                I believe in the power of shared knowledge. These modules are meticulously engineered 
+                to simplify complex paradigms and provide strategic insights for the next generation of digital architects.
               </p>
             </div>
           </AnimatedSection>
-        </section>
+        </div>
       </div>
 
-      {/* ================= YouTube Popup Modal ================= */}
+      {/* YouTube Modal */}
       {activeVideo && (
-<div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-3xl aspect-video bg-black rounded-2xl overflow-hidden border border-white/20 shadow-2xl">
-            
-            {/* Close Button */}
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/90 backdrop-blur-3xl p-6 md:p-12">
+          <motion.div 
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="relative w-full max-w-6xl aspect-video bg-black rounded-[3rem] overflow-hidden border border-white/10 shadow-premium"
+          >
             <button
               onClick={() => setActiveVideo(null)}
-              className="absolute top-3 right-3 z-10 bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-lg border border-white/30 hover:bg-white/30 transition-colors drop-shadow-lg"
+              className="absolute top-8 right-8 z-50 w-12 h-12 rounded-full bg-white/10 backdrop-blur-xl text-white flex items-center justify-center border border-white/20 hover:bg-white/20 transition-all shadow-glow"
             >
               ✕
             </button>
-
-            {/* YouTube Video */}
             <iframe
               className="w-full h-full"
               src={`https://www.youtube.com/embed/${activeVideo}?autoplay=1`}
@@ -135,10 +185,9 @@ const Learn = () => {
               allow="autoplay; encrypted-media"
               allowFullScreen
             />
-          </div>
+          </motion.div>
         </div>
       )}
-      {/* ======================================================= */}
     </PageTransition>
   );
 };

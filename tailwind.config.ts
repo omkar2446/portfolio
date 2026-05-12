@@ -14,22 +14,12 @@ export default {
     },
     
     extend: {
-      keyframes: {
-  "accordion-down": {
-    from: { height: "0" },
-    to: { height: "var(--radix-accordion-content-height)" },
-  },
-  "accordion-up": {
-    from: { height: "var(--radix-accordion-content-height)" },
-    to: { height: "0" },
-  },
-
-  // ✅ ADD THISx 
-  float: {
-    "0%, 100%": { transform: "translateY(0px)" },
-    "50%": { transform: "translateY(-6px)" }, // small movement = smooth
-  },
-},
+      boxShadow: {
+        soft: "var(--shadow-soft)",
+        medium: "var(--shadow-medium)",
+        premium: "var(--shadow-premium)",
+        glow: "var(--shadow-glow)",
+      },
       fontFamily: {
         outfit: ['Outfit', 'sans-serif'],
       },
@@ -82,15 +72,20 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        float: {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        shimmer: {
+          "100%": { transform: "translateX(100%)" },
+        },
       },
       animation: {
-  "accordion-down": "accordion-down 0.2s ease-out",
-  "accordion-up": "accordion-up 0.2s ease-out",
-
-  // ✅ ADD THIS
-  float: "float 6s ease-in-out infinite",
-},
-
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        float: "float 6s ease-in-out infinite",
+        shimmer: "shimmer 2s infinite",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

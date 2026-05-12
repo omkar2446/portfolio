@@ -30,23 +30,25 @@ const Navbar = () => {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        isScrolled ? 'bg-background/80 backdrop-blur-lg border-b border-white/5 py-4' : 'bg-transparent py-6'
+        isScrolled ? 'py-4' : 'py-8'
       }`}
     >
-      <div className="container-max flex items-center justify-between">
+      <div className={`container-max flex items-center justify-between transition-all duration-500 ${
+        isScrolled ? 'bg-background/40 backdrop-blur-2xl border border-white/5 py-3 px-8 rounded-full shadow-premium max-w-4xl' : ''
+      }`}>
         <Link to="/" className="relative z-10">
           <motion.div
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2"
+            className="flex items-center gap-3"
           >
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-blue-400 flex items-center justify-center shadow-lg shadow-primary/20">
-              <span className="text-white font-bold text-xl">O</span>
+            <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center shadow-glow shimmer">
+              <span className="text-white font-black text-xl">O</span>
             </div>
-            <span className="text-foreground font-bold tracking-tight text-xl hidden sm:block">
-              Portfolio
+            <span className="text-foreground font-black tracking-tighter text-2xl hidden sm:block">
+              PORTFOLIO<span className="text-primary">.</span>
             </span>
           </motion.div>
         </Link>
@@ -57,10 +59,10 @@ const Navbar = () => {
             <Link
               key={link.path}
               to={link.path}
-              className="relative px-4 py-2 group"
+              className="relative px-5 py-2 group"
             >
-              <span className={`relative z-10 text-sm font-medium transition-colors duration-300 ${
-                location.pathname === link.path ? 'text-primary' : 'text-foreground/70 group-hover:text-foreground'
+              <span className={`relative z-10 text-xs font-black uppercase tracking-[0.2em] transition-all duration-500 ${
+                location.pathname === link.path ? 'text-primary' : 'text-foreground/40 group-hover:text-foreground'
               }`}>
                 {link.label}
               </span>
@@ -68,15 +70,9 @@ const Navbar = () => {
                 <motion.div
                   layoutId="nav-active"
                   className="absolute inset-0 bg-primary/5 rounded-full"
-                  transition={{ type: 'spring', duration: 0.6 }}
+                  transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                 />
               )}
-              <motion.div
-                className="absolute bottom-0 left-4 right-4 h-0.5 bg-primary opacity-0 group-hover:opacity-100"
-                initial={{ scaleX: 0 }}
-                whileHover={{ scaleX: 1 }}
-                transition={{ duration: 0.3 }}
-              />
             </Link>
           ))}
           <div className="ml-4 pl-4 border-l border-white/10">
@@ -100,20 +96,19 @@ const Navbar = () => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="absolute top-full left-0 right-0 bg-background/95 backdrop-blur-xl border-b border-white/5 p-6 md:hidden"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="absolute top-full left-0 right-0 bg-background/95 backdrop-blur-3xl border-b border-white/5 overflow-hidden md:hidden"
           >
-            <div className="flex flex-col gap-4">
+            <div className="container-max py-10 flex flex-col gap-8">
               {navLinks.map((link) => (
                 <Link
                   key={link.path}
                   to={link.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`text-lg font-medium transition-colors ${
-                    location.pathname === link.path ? 'text-primary' : 'text-foreground/70'
+                  className={`text-4xl font-black tracking-tighter transition-all ${
+                    location.pathname === link.path ? 'text-primary' : 'text-foreground/20'
                   }`}
                 >
                   {link.label}

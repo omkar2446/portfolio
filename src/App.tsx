@@ -7,7 +7,6 @@ import { ThemeProvider } from "next-themes";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import PremiumBackground from "./components/PremiumBackground";
-import CustomCursor from "./components/CustomCursor";
 import Home from "./pages/Home";
 
 import About from "./pages/About";
@@ -30,7 +29,6 @@ const App = () => {
           <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
             <div className="min-h-screen flex flex-col transition-colors duration-300 relative">
               <PremiumBackground />
-              <CustomCursor />
               <Navbar />
 
               <main className="flex-grow relative z-0">

@@ -4,42 +4,44 @@ import { motion } from 'framer-motion';
 const PremiumBackground: React.FC = () => {
   return (
     <div className="fixed inset-0 -z-50 overflow-hidden pointer-events-none bg-background">
-      {/* Soft Animated Gradients */}
+      {/* Dynamic Mesh Gradients */}
       <motion.div
         animate={{
-          scale: [1, 1.1, 1],
-          opacity: [0.2, 0.3, 0.2],
-          x: [0, 50, 0],
-          y: [0, -30, 0],
+          scale: [1, 1.2, 1],
+          opacity: [0.15, 0.3, 0.15],
+          x: ['-10%', '10%', '-10%'],
+          y: ['-10%', '5%', '-10%'],
         }}
-        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-primary/20 blur-[120px] rounded-full"
+        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-0 left-0 w-[100%] h-[100%] bg-[radial-gradient(circle_at_0%_0%,rgba(59,130,246,0.15)_0%,transparent_50%)] blur-[80px]"
       />
       <motion.div
         animate={{
-          scale: [1.1, 1, 1.1],
-          opacity: [0.15, 0.25, 0.15],
-          x: [0, -40, 0],
-          y: [0, 60, 0],
+          scale: [1.2, 1, 1.2],
+          opacity: [0.1, 0.25, 0.1],
+          x: ['10%', '-5%', '10%'],
+          y: ['10%', '-5%', '10%'],
         }}
-        transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-blue-400/10 blur-[100px] rounded-full"
+        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute bottom-0 right-0 w-[100%] h-[100%] bg-[radial-gradient(circle_at_100%_100%,rgba(99,102,241,0.1)_0%,transparent_50%)] blur-[100px]"
       />
 
-      {/* Grid Overlay */}
+      {/* Grid Overlay with Radial Mask */}
       <div 
-        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]" 
+        className="absolute inset-0 opacity-[0.03] dark:opacity-[0.08]" 
         style={{ 
           backgroundImage: `linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)`,
-          backgroundSize: '40px 40px'
+          backgroundSize: '60px 60px',
+          maskImage: 'radial-gradient(circle at 50% 50%, black, transparent 80%)',
+          WebkitMaskImage: 'radial-gradient(circle at 50% 50%, black, transparent 80%)'
         }} 
       />
 
-      {/* Radial Glow */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_0%,rgba(var(--background),0.8)_100%)]" />
-
-      {/* Noise Texture (Optional but adds premium feel) */}
-      <div className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay" style={{ backgroundImage: `url('https://grainy-gradients.vercel.app/noise.svg')` }} />
+      {/* Subtle Grain/Noise Texture */}
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none mix-blend-overlay" style={{ backgroundImage: `url('https://grainy-gradients.vercel.app/noise.svg')` }} />
+      
+      {/* Global Vignette */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,transparent_20%,rgba(0,0,0,0.1)_100%)] dark:bg-[radial-gradient(circle_at_50%_50%,transparent_20%,rgba(0,0,0,0.4)_100%)]" />
     </div>
   );
 };

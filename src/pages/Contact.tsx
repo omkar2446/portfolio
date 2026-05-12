@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import PageTransition from '@/components/PageTransition';
 import AnimatedSection from '@/components/AnimatedSection';
+import { Send, Mail, Github, Linkedin, MapPin, Loader2, Briefcase } from 'lucide-react';
 import SectionTitle from '@/components/SectionTitle';
-import { Send, Mail, Github, Linkedin, MapPin, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -47,112 +47,71 @@ const Contact = () => {
     }));
   };
 
-  const contactInfo = [
-    {
-      icon: <Mail size={24} />,
-      label: 'Email',
-      value: 'otambe655@gmail.com',
-      href: 'otambe655@gmail.com',
-    },
-    {
-      icon: <Github size={24} />,
-      label: 'GitHub',
-      value: 'github.com/omkar2446',
-      href: 'https://github.com/omkar2446',
-    },
-    {
-      icon: <Linkedin size={24} />,
-      label: 'LinkedIn',
-      value: 'linkedin.com/in/omkar-tambe-311a72350',
-      href: 'https://linkedin.com/in/omkar-tambe-311a72350',
-    },
-  ];
-
   return (
     <PageTransition>
-      <div className="min-h-screen pt-24">
-        <section className="container mx-auto px-6 py-20">
+      <div className="min-h-screen pt-32 pb-20 overflow-hidden">
+        <div className="container-max">
           <SectionTitle 
-            title="Contact Me" 
-            subtitle="Let's connect and discuss your ideas"
-            className="text-white drop-shadow-lg"
+            centered
+            label="Collaboration"
+            title="Get In Touch" 
+            subtitle="Ready to elevate your digital presence? Let's discuss how technical precision can drive your vision forward."
           />
 
-          <div className="grid lg:grid-cols-2 gap-12">
+          <div className="grid lg:grid-cols-2 gap-16">
             {/* Contact Form */}
             <AnimatedSection>
-              <div className="backdrop-blur-xl bg-white/10 hover:bg-white/15 border border-white/20 rounded-2xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500">
-                <h3 className="text-xl font-bold text-white mb-6 drop-shadow-lg">
-                  Send a Message
-                </h3>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div>
-                    <label 
-                      htmlFor="name" 
-                      className="block text-sm font-medium text-white mb-2 drop-shadow-md"
-                    >
-                      Name
-                    </label>
-                    <input
-                      type="text"
-                      id="name"
+              <div className="glass-card p-12 md:p-16 border-white/5 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[100px] rounded-full -mr-32 -mt-32" />
+                <div className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground/20 mb-10">MESSAGE TERMINAL</div>
+                
+                <form onSubmit={handleSubmit} className="space-y-10 relative z-10">
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/30 px-2">Your Name</label>
+                    <input 
+                      type="text" 
                       name="name"
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 rounded-xl backdrop-blur-sm bg-white/10 border border-white/20 text-white placeholder-gray-300 focus:border-white/40 focus:ring-2 focus:ring-white/20 outline-none transition-all"
-                      placeholder="Your name"
+                      placeholder="John Doe"
+                      className="w-full px-8 py-6 rounded-[2rem] bg-secondary/30 border border-white/5 focus:border-primary focus:ring-8 focus:ring-primary/5 outline-none transition-all duration-500 font-bold"
                     />
                   </div>
-                  
-                  <div>
-                    <label 
-                      htmlFor="email" 
-                      className="block text-sm font-medium text-white mb-2 drop-shadow-md"
-                    >
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/30 px-2">Your Email</label>
+                    <input 
+                      type="email" 
                       name="email"
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 rounded-xl backdrop-blur-sm bg-white/10 border border-white/20 text-white placeholder-gray-300 focus:border-white/40 focus:ring-2 focus:ring-white/20 outline-none transition-all"
-                      placeholder="your@email.com"
+                      placeholder="john@example.com"
+                      className="w-full px-8 py-6 rounded-[2rem] bg-secondary/30 border border-white/5 focus:border-primary focus:ring-8 focus:ring-primary/5 outline-none transition-all duration-500 font-bold"
                     />
                   </div>
-                  
-                  <div>
-                    <label 
-                      htmlFor="message" 
-                      className="block text-sm font-medium text-white mb-2 drop-shadow-md"
-                    >
-                      Message
-                    </label>
-                    <textarea
-                      id="message"
+                  <div className="space-y-4">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground/30 px-2">Project Details</label>
+                    <textarea 
                       name="message"
                       value={formData.message}
                       onChange={handleChange}
                       required
                       rows={5}
-                      className="w-full px-4 py-3 rounded-xl backdrop-blur-sm bg-white/10 border border-white/20 text-white placeholder-gray-300 focus:border-white/40 focus:ring-2 focus:ring-white/20 outline-none transition-all resize-none"
-                      placeholder="Your message..."
+                      placeholder="Tell me about your architectural vision..."
+                      className="w-full px-8 py-6 rounded-[2.5rem] bg-secondary/30 border border-white/5 focus:border-primary focus:ring-8 focus:ring-primary/5 outline-none transition-all duration-500 font-bold resize-none"
                     />
                   </div>
-                  
-                  <Button type="submit" variant="hero" size="lg" className="w-full backdrop-blur-sm bg-white/10 hover:bg-white/20 border-white/20 text-white hover:text-white shadow-lg hover:shadow-xl transition-all duration-300" disabled={isSubmitting}>
+                  <Button type="submit" className="btn-premium w-full py-10 text-xl font-black uppercase tracking-[0.3em] shimmer shadow-premium" disabled={isSubmitting}>
                     {isSubmitting ? (
                       <>
-                        <Loader2 size={18} className="animate-spin" />
-                        Sending...
+                        <Loader2 size={24} className="mr-3 animate-spin" />
+                        Transmitting...
                       </>
                     ) : (
                       <>
-                        Send Message
-                        <Send size={18} />
+                        Submit Inquiry
+                        <Send size={24} className="ml-3" />
                       </>
                     )}
                   </Button>
@@ -161,56 +120,56 @@ const Contact = () => {
             </AnimatedSection>
 
             {/* Contact Info */}
-            <AnimatedSection delay={200}>
-              <div className="space-y-6">
-                <div className="backdrop-blur-xl bg-white/10 hover:bg-white/15 border border-white/20 rounded-2xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500">
-                  <h3 className="text-xl font-bold text-white mb-6 drop-shadow-lg">
-                    Get in Touch
-                  </h3>
-                  <p className="text-gray-100 mb-8 drop-shadow-md">
-                    Feel free to reach out for collaborations, project inquiries, 
-                    or just a friendly chat about tech and innovation.
-                  </p>
-                  
-                  <div className="space-y-4">
-                    {contactInfo.map((info) => (
-                      <a
-                        key={info.label}
-                        href={info.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center gap-4 p-4 rounded-xl backdrop-blur-sm bg-white/5 hover:bg-white/10 border border-white/10 transition-all duration-300 group shadow-lg hover:shadow-xl"
+            <div className="space-y-12">
+              <AnimatedSection delay={200}>
+                <div className="glass-card p-12 md:p-16 border-white/5 relative overflow-hidden h-full flex flex-col">
+                  <div className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground/20 mb-10">CONTACT CHANNELS</div>
+                  <div className="space-y-10 flex-grow">
+                    {[
+                      { icon: <Mail size={24} />, label: 'Direct Email', value: 'otambe655@gmail.com', href: 'mailto:otambe655@gmail.com' },
+                      { icon: <Briefcase size={24} />, label: 'Professional Availability', value: 'Accepting select Q1 2025 projects', href: '#' },
+                      { icon: <MapPin size={24} />, label: 'Global Base', value: 'Maharashtra, India', href: '#' }
+                    ].map((item, i) => (
+                      <a 
+                        key={i} 
+                        href={item.href}
+                        className="flex items-center gap-8 group cursor-pointer"
                       >
-                        <div className="p-3 rounded-xl backdrop-blur-sm bg-white/10 text-white group-hover:scale-110 transition-transform border border-white/20">
-                          {info.icon}
+                        <div className="w-16 h-16 rounded-[2rem] bg-secondary flex items-center justify-center text-foreground/40 group-hover:text-primary group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-500 shadow-soft">
+                          {item.icon}
                         </div>
                         <div>
-                          <p className="text-sm text-gray-200 drop-shadow-sm">{info.label}</p>
-                          <p className="font-medium text-white group-hover:text-white transition-colors drop-shadow-md">
-                            {info.value}
-                          </p>
+                          <div className="text-[10px] font-black uppercase tracking-widest text-foreground/20 mb-2">{item.label}</div>
+                          <div className="text-xl font-black group-hover:text-foreground transition-colors">{item.value}</div>
                         </div>
                       </a>
                     ))}
                   </div>
-                </div>
 
-                {/* Location Card */}
-                <div className="backdrop-blur-xl bg-white/10 hover:bg-white/15 border border-white/20 rounded-2xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-500">
-                  <div className="flex items-center gap-4">
-                    <div className="p-3 rounded-xl backdrop-blur-sm bg-white/10 text-white border border-white/20">
-                      <MapPin size={24} />
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-200 drop-shadow-sm">Location</p>
-                      <p className="font-medium text-white drop-shadow-md">India</p>
+                  <div className="mt-16 pt-10 border-t border-white/5">
+                    <div className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground/20 mb-8">SOCIAL ARCHIVES</div>
+                    <div className="flex gap-6">
+                      {[
+                        { icon: <Github size={20} />, link: 'https://github.com/omkar2446' },
+                        { icon: <Linkedin size={20} />, link: 'https://www.linkedin.com/in/omkar-tambe-311a72350/' }
+                      ].map((social, i) => (
+                        <a
+                          key={i}
+                          href={social.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-14 h-14 rounded-2xl bg-secondary flex items-center justify-center text-foreground/40 hover:text-primary hover:bg-primary/10 transition-all duration-300 shadow-soft"
+                        >
+                          {social.icon}
+                        </a>
+                      ))}
                     </div>
                   </div>
                 </div>
-              </div>
-            </AnimatedSection>
+              </AnimatedSection>
+            </div>
           </div>
-        </section>
+        </div>
       </div>
     </PageTransition>
   );

@@ -11,19 +11,25 @@ interface SkillCardProps {
 const SkillCard = ({ icon, title, isLearning, className }: SkillCardProps) => {
   return (
     <motion.div 
-      whileHover={{ y: -10, scale: 1.02 }}
-      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-      className={`glass-card p-8 flex flex-col items-center group relative overflow-hidden card-lift shadow-glow ${className || ''}`}
+      whileHover={{ y: -12, scale: 1.02 }}
+      transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+      className={`glass-card p-10 flex flex-col items-center group relative overflow-hidden card-lift shimmer ${className || ''}`}
     >
-      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary mb-4 transition-transform duration-500 group-hover:scale-110">
+      <div className="w-16 h-16 rounded-2xl bg-primary/5 flex items-center justify-center text-primary mb-6 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 group-hover:bg-primary/10 shadow-soft">
         {icon}
       </div>
-      <h3 className="font-bold text-sm uppercase tracking-widest text-foreground/80 mb-2">{title}</h3>
+      <h3 className="font-black text-xs uppercase tracking-[0.3em] text-foreground/40 group-hover:text-foreground transition-colors duration-500 text-center">{title}</h3>
+      
       {isLearning && (
-        <span className="text-[10px] uppercase tracking-wider px-3 py-1 rounded-full bg-primary/10 text-primary font-bold border border-primary/20">
-          Learning
-        </span>
+        <div className="absolute top-4 right-4">
+          <span className="text-[8px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-primary/10 text-primary border border-primary/20 shadow-glow animate-pulse">
+            Developing
+          </span>
+        </div>
       )}
+      
+      {/* Decorative inner glow */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
     </motion.div>
   );
 };
