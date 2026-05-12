@@ -1,41 +1,73 @@
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 
 const PremiumBackground = () => {
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePos({ x: e.clientX, y: e.clientY });
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   return (
-    <div className="fixed inset-0 -z-10 overflow-hidden bg-background">
-      {/* Primary Glow */}
-      <motion.div 
-        animate={{ 
-          scale: [1, 1.2, 1],
-          x: [0, 50, 0],
-          y: [0, 30, 0],
+    <div className="fixed inset-0 z-[-1] overflow-hidden bg-background pointer-events-none select-none">
+      {/* Dynamic Ambient Glows - Indigo & Cyan Fusion */}
+      <motion.div
+        animate={{
+          x: mousePos.x * 0.05,
+          y: mousePos.y * 0.05,
         }}
-        transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -top-[10%] -left-[10%] w-[60%] h-[60%] bg-primary/10 blur-[120px] rounded-full"
+        className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] rounded-full bg-indigo-500/5 blur-[150px] opacity-40"
+      />
+      <motion.div
+        animate={{
+          x: -mousePos.x * 0.03,
+          y: -mousePos.y * 0.03,
+        }}
+        className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-cyan-500/5 blur-[130px] opacity-30"
+      />
+      <motion.div
+        animate={{
+          x: mousePos.x * 0.02,
+          y: -mousePos.y * 0.02,
+        }}
+        className="absolute top-[20%] right-[10%] w-[40%] h-[40%] rounded-full bg-violet-500/5 blur-[120px] opacity-20"
       />
       
-      {/* Secondary Glow */}
-      <motion.div 
-        animate={{ 
-          scale: [1.2, 1, 1.2],
-          x: [0, -40, 0],
-          y: [0, -50, 0],
+      {/* Subdued Technical Grid */}
+      <div 
+        className="absolute inset-0 opacity-[0.01] dark:opacity-[0.02]" 
+        style={{ 
+          backgroundImage: `linear-gradient(to right, #6366f1 1px, transparent 1px), linear-gradient(to bottom, #6366f1 1px, transparent 1px)`,
+          backgroundSize: '4rem 4rem'
         }}
-        transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] bg-indigo-500/10 blur-[150px] rounded-full"
       />
 
-      {/* Accent Glow */}
-      <motion.div 
-        animate={{ 
-          opacity: [0.1, 0.3, 0.1],
-        }}
-        transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80%] h-[80%] bg-purple-500/[0.03] blur-[180px] rounded-full"
-      />
+      {/* Animated Neural Particles */}
+      {[...Array(8)].map((_, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0 }}
+          animate={{ 
+            opacity: [0, 0.2, 0],
+            scale: [0.8, 1.2, 0.8],
+            x: [Math.random() * 100 + '%', Math.random() * 100 + '%'],
+            y: [Math.random() * 100 + '%', Math.random() * 100 + '%']
+          }}
+          transition={{
+            duration: 20 + Math.random() * 15,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute w-1 h-1 bg-cyan-400 rounded-full blur-[1px]"
+        />
+      ))}
 
-      {/* Grid Overlay */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
+      {/* Surface Depth */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background" />
     </div>
   );
 };

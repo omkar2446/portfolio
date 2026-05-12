@@ -18,16 +18,16 @@ const SectionTitle = ({ title, subtitle, label, className, centered = false }: S
       className={`mb-24 ${centered ? 'text-center' : ''} ${className || ''}`}
     >
       {label && (
-        <div className={`text-[10px] font-black uppercase tracking-[0.5em] text-primary mb-6 ${centered ? 'mx-auto' : ''}`}>
-          // {label}
+        <div className={`text-[12px] font-sans font-semibold uppercase tracking-[0.15em] text-primary mb-6 ${centered ? 'mx-auto' : ''}`}>
+          {label}
         </div>
       )}
-      <h2 className="text-5xl md:text-8xl font-black mb-8 tracking-tighter leading-[0.95] text-balance">
+      <h2 className="text-[2.5rem] md:text-[5rem] font-heading font-bold mb-8 tracking-[-0.03em] leading-[1.1] text-foreground text-balance">
         {title}
       </h2>
 
       {subtitle && (
-        <p className={`text-xl md:text-2xl text-foreground/40 max-w-4xl leading-relaxed font-medium ${centered ? 'mx-auto' : ''}`}>
+        <p className={`text-[1.05rem] font-sans font-normal leading-[1.8] text-foreground/60 max-w-4xl ${centered ? 'mx-auto' : ''}`}>
           {subtitle}
         </p>
       )}
