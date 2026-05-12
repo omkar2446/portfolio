@@ -21,7 +21,8 @@ export default {
         glow: "var(--shadow-glow)",
       },
       fontFamily: {
-        outfit: ['Outfit', 'sans-serif'],
+        sans: ['Inter', 'sans-serif'],
+        heading: ['Space Grotesk', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",

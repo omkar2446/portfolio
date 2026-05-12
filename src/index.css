@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,7 +6,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 220 33% 98%;
     --foreground: 224 71.4% 4.1%;
 
     --card: 0 0% 100%;
@@ -43,22 +43,22 @@
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 230 35% 7%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 230 35% 9%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 230 35% 7%;
     --popover-foreground: 210 40% 98%;
 
     --primary: 217.2 91.2% 59.8%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 230 35% 15%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
+    --muted: 230 35% 15%;
     --muted-foreground: 215 20.2% 65.1%;
 
     --accent: 217.2 32.6% 17.5%;
@@ -67,14 +67,14 @@
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
+    --border: 230 35% 15%;
+    --input: 230 35% 15%;
     --ring: 224.3 76.3% 48%;
 
-    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.25);
-    --shadow-medium: 0 10px 30px rgba(0, 0, 0, 0.35);
-    --shadow-premium: 0 20px 40px rgba(0, 0, 0, 0.45);
-    --shadow-glow: 0 10px 35px rgba(59, 130, 246, 0.18);
+    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --shadow-medium: 0 10px 30px rgba(0, 0, 0, 0.5);
+    --shadow-premium: 0 20px 40px rgba(0, 0, 0, 0.6);
+    --shadow-glow: 0 10px 35px rgba(59, 130, 246, 0.25);
   }
 }
 
@@ -84,16 +84,16 @@
   }
 
   body {
-    @apply bg-background text-foreground font-outfit antialiased selection:bg-primary/20 selection:text-primary;
+    @apply bg-background text-foreground font-sans antialiased selection:bg-primary/20 selection:text-primary;
     background-attachment: fixed;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-black tracking-tighter text-foreground leading-[1.1] text-balance;
+    @apply font-heading font-bold tracking-tight text-foreground leading-[1.1] text-balance;
   }
 
   p {
-    @apply leading-relaxed text-foreground/60;
+    @apply leading-[1.8] text-foreground/60 font-sans;
   }
 }
 
@@ -107,12 +107,13 @@
   }
 
   .glass-card {
-    @apply bg-background/40 backdrop-blur-xl border border-white/10 rounded-2xl transition-all duration-300;
+    @apply bg-card/60 backdrop-blur-xl border border-white/5 rounded-2xl transition-all duration-300;
     box-shadow: var(--shadow-soft);
   }
 
   .glass-card:hover {
     box-shadow: var(--shadow-premium), var(--shadow-glow);
+    @apply border-primary/20 bg-card/80;
   }
 
   .nav-blur {
@@ -120,32 +121,29 @@
   }
 
   .text-gradient {
-    @apply bg-gradient-to-br from-primary via-blue-400 to-indigo-500 bg-clip-text text-transparent;
+    @apply bg-gradient-to-br from-[#3B82F6] via-[#8B5CF6] to-[#EC4899] bg-clip-text text-transparent;
   }
 
   .text-gradient-white {
-    @apply bg-gradient-to-br from-white via-white/90 to-white/60 bg-clip-text text-transparent;
+    @apply bg-gradient-to-br from-foreground via-foreground/90 to-foreground/60 bg-clip-text text-transparent;
   }
 
   .btn-premium {
-    @apply relative px-8 py-3 bg-primary text-primary-foreground font-semibold rounded-full overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] active:scale-95;
-  }
-
-  .btn-premium::after {
-    content: '';
-    @apply absolute inset-0 bg-white/10 opacity-0 transition-opacity duration-300;
-  }
-
-  .btn-premium:hover::after {
-    @apply opacity-100;
+    @apply relative px-8 py-3 bg-primary text-primary-foreground font-semibold rounded-full overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_0_25px_rgba(59,130,246,0.5)] active:scale-95;
   }
 
   .card-lift {
-    @apply transition-all duration-500 ease-out hover:-translate-y-2 hover:shadow-premium;
+    @apply transition-all duration-500 ease-out hover:-translate-y-2;
   }
 
   .shimmer {
     @apply relative overflow-hidden before:absolute before:inset-0 before:-translate-x-full before:animate-shimmer before:bg-gradient-to-r before:from-transparent before:via-white/10 before:to-transparent;
+  }
+
+  /* Typewriter Cursor */
+  .typewriter-cursor::after {
+    content: '|';
+    @apply ml-1 text-primary animate-pulse;
   }
 }
 

@@ -45,9 +45,9 @@ const Navbar = () => {
             className="flex items-center gap-3"
           >
             <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center shadow-glow shimmer">
-              <span className="text-white font-black text-xl">O</span>
+              <span className="text-white font-heading font-extrabold text-xl">O</span>
             </div>
-            <span className="text-foreground font-black tracking-tighter text-2xl hidden sm:block">
+            <span className="text-foreground font-heading font-bold tracking-tighter text-2xl hidden sm:block">
               PORTFOLIO<span className="text-primary">.</span>
             </span>
           </motion.div>
@@ -61,18 +61,20 @@ const Navbar = () => {
               to={link.path}
               className="relative px-5 py-2 group"
             >
-              <span className={`relative z-10 text-xs font-black uppercase tracking-[0.2em] transition-all duration-500 ${
-                location.pathname === link.path ? 'text-primary' : 'text-foreground/40 group-hover:text-foreground'
+              <span className={`relative z-10 text-[15px] font-sans font-medium tracking-tight transition-all duration-500 ${
+                location.pathname === link.path ? 'text-primary' : 'text-foreground/60 group-hover:text-foreground'
               }`}>
                 {link.label}
               </span>
               {location.pathname === link.path && (
                 <motion.div
                   layoutId="nav-active"
-                  className="absolute inset-0 bg-primary/5 rounded-full"
+                  className="absolute bottom-0 left-5 right-5 h-0.5 bg-primary shadow-glow"
                   transition={{ type: 'spring', bounce: 0.2, duration: 0.6 }}
                 />
               )}
+              {/* Hover underline animation */}
+              <div className="absolute bottom-0 left-5 right-5 h-0.5 bg-primary/20 scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
             </Link>
           ))}
           <div className="ml-4 pl-4 border-l border-white/10">
@@ -107,7 +109,7 @@ const Navbar = () => {
                   key={link.path}
                   to={link.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`text-4xl font-black tracking-tighter transition-all ${
+                  className={`text-4xl font-heading font-bold tracking-tighter transition-all ${
                     location.pathname === link.path ? 'text-primary' : 'text-foreground/20'
                   }`}
                 >
